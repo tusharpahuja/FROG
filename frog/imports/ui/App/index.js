@@ -15,7 +15,7 @@ const DEFAULT_PASSWORD = '123456';
 const connectWithDefaultPwd = username =>
   Meteor.loginWithPassword(username, DEFAULT_PASSWORD);
 
-const apps = {
+export const apps = {
   home: 'Home',
   admin: 'Admin',
   graph: 'Graph Editor',
@@ -102,7 +102,7 @@ const setupSubscriptions = (collections: string[]) => {
   return every(subscriptions.map(x => x.ready()), Boolean);
 };
 
-const PageContainer = createContainer((props: { username: string }) => {
+export const PageContainer = createContainer((props: { username: string }) => {
   let ready = setupSubscriptions([
     'activity_data',
     'logs',
