@@ -39,7 +39,7 @@ export default class App extends Component {
 
   handleNewHash = () => {
     const [, username, location] = window.location.hash.split('/');
-    if(window.location.pathname.split('/')[1] !== 'api'){
+    if (window.location.pathname.split('/')[1] !== 'api') {
       if (username) {
         if (!Meteor.users.findOne({ username })) {
           Accounts.createUser({ username, password: DEFAULT_PASSWORD }, () =>
