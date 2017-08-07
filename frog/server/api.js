@@ -1,15 +1,19 @@
 import bodyParser from 'body-parser';
 import { Picker } from 'meteor/meteorhacks:picker';
 import { OAuth } from 'oauth';
+import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
+//import {setStudentSession} from '../sessions';
 // import {React} from 'react';
 // import {apps, PageContainer} from '../../ui/App/index';
+const DEFAULT_PASSWORD = '123456';
 
 Picker.middleware(bodyParser.urlencoded({ extended: false }));
 Picker.middleware(bodyParser.json());
 
 Picker.filter(
   (req, res) => req.method === 'POST'
-).route('/api/webhooks/:provider', ({ Provider }, request, response) => {
+).route('/api/webhooks/:provider', ({ Provider }, request, response, next) => {
   // We'll handle the request here.`
   // console.log(request);
 
@@ -41,7 +45,7 @@ Picker.filter(
   // console.log(request.body.oauth_signature);
 
   if (isLTI) {
-    if (isValid) console.log('valid LTI launch request');
+    if (isValid && hasParams) console.log('valid LTI launch request');
     else console.log('unvalid LTI launch request');
   }
 
@@ -60,7 +64,25 @@ Picker.filter(
   //     currentApp={this.state.app === undefined ? '' : this.state.app}
   //   />);
   // }
-  console.log(request.body);
 
-  response.end(JSON.stringify(request.body));
+/*
+  let account = Meteor.users.findOne({'services.lti.user_id': request.body.user_id});
+  if(!account){
+    account = Accounts.createUser({'username': request.body.tool_consumer_instance_name, 'password': DEFAULT_PASSWORD});
+  }
+  const token = Accounts._generateStampedLoginToken();
+  const hashedToken = Accounts._hashStampedToken(token);
+  Meteor.users.update(
+    { _id: account },
+    { $set: { 'services.resume.loginTokens': [hashedToken], 'services.lti': request.body } }
+  );
+  */
+
+   //response.writeHead(301, {'Location': '/#/student1'});
+   response.statusCode = 303;
+   response.setHeader('Location', '/#/student1');
+   response.setHeader('Set-Cookie', "meteor_login_token=#{token.token}; Max-Age=3600; Version=1");
+   response.setHeader('Set-Cookie', "meteor_login_token_expires=#{token.when}; Max-Age=3600; Version=1");
+   next();
+  //response.end();
 });
