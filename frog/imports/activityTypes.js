@@ -1,32 +1,27 @@
 // @flow
-
-import acInduction from 'ac-induction';
-import acBrainstorm from 'ac-brainstorm';
-import acChat from 'ac-chat';
-import acVideo from 'ac-video';
-import acIframe from 'ac-iframe';
-import acText from 'ac-text';
-import acForm from 'ac-form';
-import acQuiz from 'ac-quiz';
-import acCKBoard from 'ac-ck-board';
-
 import { type ActivityPackageT, flattenOne } from 'frog-utils';
-
 import { keyBy } from 'lodash';
 
-export const activityTypes: ActivityPackageT[] = flattenOne([
-  acInduction,
-  acBrainstorm,
-  acChat,
-  acVideo,
-  acIframe,
-  acText,
-  acForm,
-  acCKBoard,
-  acQuiz
-]).map(x => Object.freeze(x));
+codegen`
+import fs from 'fs-extra';
+const camelCased = s => s.replace(/-([a-z])/g, g => g[1].toUpperCase());
 
-// see explanation of `any` in operatorTypes.js
+const pkgjs = fs.readFileSync('../package.json');
+const pkg = JSON.parse(pkgjs);
+const activities = Object.keys(pkg.dependencies).filter(x =>
+  x.startsWith('ac-')
+);
+
+const imports = activities
+  .map(x => \`import \${camelCased(x)} from '\${x}';\`)
+  .join('\\n');
+const list = activities.map(x => camelCased(x)).join(',');
+const atypes =  "const atypes = flattenOne(["+list+"]).map(x => Object.freeze(x));"
+module.exports = imports+"\\n"+atypes
+`;
+
+// see explanation of 'any' in operatorTypes.js
+export const activityTypes: ActivityPackageT[] = atypes;
 export const activityTypesObj: { [actId: string]: ActivityPackageT } = (keyBy(
   activityTypes,
   'id'
