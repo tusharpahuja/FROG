@@ -6,7 +6,6 @@ import Board from './board';
 
 const meta = {
   name: 'Common Knowledge board',
-  type: 'react-component',
   mode: 'collab',
   shortDesc: '2D board for placing items',
   description:
@@ -83,6 +82,13 @@ const config = {
   }
 };
 
+const configUI = {
+  quadrant1: { conditional: 'quadrants' },
+  quadrant2: { conditional: 'quadrants' },
+  quadrant3: { conditional: 'quadrants' },
+  quadrant4: { conditional: 'quadrants' }
+};
+
 const dataStructure = [];
 
 const mergeFunction = (object, dataFn) => {
@@ -100,8 +106,10 @@ const mergeFunction = (object, dataFn) => {
 
 export default ({
   id: 'ac-ck-board',
+  type: 'react-component',
   meta,
   config,
+  configUI,
   ActivityRunner: Board,
   Dashboard: null,
   dataStructure,

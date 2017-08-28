@@ -5,11 +5,10 @@ import Form from 'react-jsonschema-form';
 
 import type { ActivityRunnerT, ActivityPackageT } from 'frog-utils';
 
-import config from './config';
+import { config, validateConfig } from './config';
 
 const meta = {
   name: 'Simple form',
-  type: 'react-component',
   shortDesc: 'Form with text fields',
   description:
     'Creates a form with specified text fields, optionally allow students to submit multiple forms.',
@@ -90,7 +89,9 @@ const ActivityRunner = ({ activityData, data, dataFn }: ActivityRunnerT) => {
 
 export default ({
   id: 'ac-form',
+  type: 'react-component',
   meta,
   config,
+  validateConfig,
   ActivityRunner
 }: ActivityPackageT);

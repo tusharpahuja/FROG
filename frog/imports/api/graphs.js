@@ -39,8 +39,11 @@ export const setCurrentGraph = (graphId: string) => {
   );
 };
 
-export const assignGraph = () => {
+export const assignGraph = (wantedId: string) => {
   const user = Meteor.users.findOne(Meteor.userId());
+  if (wantedId && Graphs.findOne(wantedId)) {
+    return wantedId;
+  }
   let graphId;
   // Get the graph the user is editing and check if the graph exists
   graphId = user.profile ? user.profile.editingGraph : null;
@@ -68,13 +71,6 @@ Meteor.methods({
       activities.map(({ _id, ...rest }) =>
         Activities.update(_id, { $set: rest }, { upsert: true })
       );
-      if (Meteor.isServer) {
-        Activities.update(
-          { graphId, plane: 2, groupingKey: { $exists: false } },
-          { $set: { groupingKey: 'group' } },
-          { upsert: true }
-        );
-      }
 
       const actid = activities.map(x => x._id);
       Activities.remove({ _id: { $nin: actid }, graphId });

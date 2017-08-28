@@ -1,16 +1,23 @@
 // @flow
 import React, { Component } from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
-import Form from 'react-jsonschema-form';
-import { ChangeableText } from 'frog-utils';
+import FlexView from 'react-flexview';
+import {
+  type operatorPackageT,
+  ChangeableText,
+  EnhancedForm
+} from 'frog-utils';
 
 import { Operators, addOperator } from '/imports/api/activities';
 import { operatorTypes, operatorTypesObj } from '/imports/operatorTypes';
+import { ErrorList, ValidButton } from '../Validator';
 import { connect } from '../store';
+import { SelectFormWidget } from './ActivityPanel/SelectWidget';
+import addSocialFormSchema from './ActivityPanel/addSocialSchema';
 import ListComponent from './ListComponent';
 
 class ChooseOperatorTypeComp extends Component {
-  state: { expanded: number, searchStr: string };
+  state: { expanded: ?string, searchStr: string };
 
   constructor(props) {
     super(props);
@@ -31,20 +38,35 @@ class ChooseOperatorTypeComp extends Component {
         searchStr: e.target.value.toLowerCase()
       });
 
-    const filteredList = operatorTypes.filter(
-      x =>
-        x.meta.name.toLowerCase().includes(this.state.searchStr) ||
-        x.meta.shortDesc.toLowerCase().includes(this.state.searchStr) ||
-        x.meta.description.toLowerCase().includes(this.state.searchStr)
-    );
+    const filteredList = operatorTypes
+      .filter(
+        x =>
+          x.meta.name.toLowerCase().includes(this.state.searchStr) ||
+          x.meta.shortDesc.toLowerCase().includes(this.state.searchStr) ||
+          x.meta.description.toLowerCase().includes(this.state.searchStr)
+      )
+      .sort((x: Object, y: Object) => (x.meta.name < y.meta.name ? -1 : 1));
 
     return (
-      <div style={{ height: '100%' }}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+      <div
+        style={{
+          height: '100%',
+          width: '100%',
+          transform: 'translateY(-40px)'
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: '95%',
+            height: '35px'
+          }}
+        >
           <h4>Please select operator type</h4>
           <div
             className="input-group"
-            style={{ top: '5px', left: '10px', width: '250px' }}
+            style={{ top: '5px', left: '10px', width: '140px' }}
           >
             <span className="input-group-addon" id="basic-addon1">
               <span className="glyphicon glyphicon-search" aria-hidden="true" />
@@ -60,7 +82,12 @@ class ChooseOperatorTypeComp extends Component {
         </div>
         <div
           className="list-group"
-          style={{ height: '730px', width: '100%', overflow: 'scroll' }}
+          style={{
+            height: '95%',
+            width: '100%',
+            overflow: 'scroll',
+            transform: 'translateY(10px)'
+          }}
         >
           {filteredList.length === 0
             ? <div
@@ -72,7 +99,7 @@ class ChooseOperatorTypeComp extends Component {
               >
                 No result
               </div>
-            : filteredList.map(x =>
+            : filteredList.map((x: operatorPackageT) =>
                 <ListComponent
                   onSelect={() => select(x)}
                   showExpanded={this.state.expanded === x.id}
@@ -90,19 +117,44 @@ class ChooseOperatorTypeComp extends Component {
   }
 }
 
-const EditClass = ({ store: { operatorStore: { all } }, operator }) => {
+const EditClass = ({
+  store: { graphErrors, refreshValidate, valid, operatorStore: { all } },
+  operator
+}) => {
   const graphOperator = all.find(act => act.id === operator._id);
 
+  let errorColor;
+  const errors = graphErrors.filter(x => x.id === operator._id);
+  const error = errors.filter(x => x.severity === 'error');
+  const warning = errors.filter(x => x.severity === 'warning');
+  if (error.length > 0) {
+    errorColor = 'red';
+  } else if (warning.length > 0) {
+    errorColor = 'yellow';
+  } else {
+    errorColor = 'green';
+  }
+
   return (
-    <div>
+    <div style={{ height: '100%', overflowY: 'scroll', position: 'relative' }}>
       <div style={{ backgroundColor: '#eee' }}>
-        <h3>
-          <ChangeableText
-            value={graphOperator.title || ''}
-            operatorId={operator._id}
-            onChange={graphOperator.rename}
-          />
-        </h3>
+        <div style={{ position: 'absolute', left: -40 }}>
+          <ErrorList activityId={operator._id} />
+        </div>
+        <FlexView>
+          <div>
+            <h3>
+              <ChangeableText
+                value={graphOperator.title || ''}
+                operatorId={operator._id}
+                onChange={graphOperator.rename}
+              />
+            </h3>
+          </div>
+          <FlexView marginLeft="auto">
+            <ValidButton activityId={operator._id} errorColor={errorColor} />
+          </FlexView>
+        </FlexView>
         <font size={-3}>
           <i>
             {`Type: ${operatorTypesObj[operator.operatorType].meta.name}
@@ -111,20 +163,26 @@ const EditClass = ({ store: { operatorStore: { all } }, operator }) => {
         </font>
         <hr />
       </div>
-      <Form
-        schema={operatorTypesObj[operator.operatorType].config}
-        onChange={data =>
+      <EnhancedForm
+        {...addSocialFormSchema(
+          operatorTypesObj[operator.operatorType].config,
+          operatorTypesObj[operator.operatorType].configUI
+        )}
+        widgets={{ socialAttributeWidget: SelectFormWidget }}
+        formContext={{ options: valid.social[operator._id] || [] }}
+        onChange={data => {
           addOperator(
             operator.operatorType,
             data.formData,
             operator._id,
             data.errors.length > 0
-          )}
+          );
+          refreshValidate();
+        }}
         formData={operator.data}
-        liveValidate
       >
         <div />
-      </Form>
+      </EnhancedForm>
     </div>
   );
 };

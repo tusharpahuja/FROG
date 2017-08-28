@@ -2,7 +2,7 @@
 
 import { type dataUnitStructT, type ActivityPackageT } from 'frog-utils';
 
-import config from './config';
+import { config, configUI } from './config';
 import ActivityRunner from './ActivityRunner';
 import Dashboard from './Dashboard';
 
@@ -14,7 +14,6 @@ const listItems = [
 
 const meta = {
   name: 'Brainstorm',
-  type: 'react-component',
   shortDesc:
     'Display text items, and vote up/down. Optionally students can add new items',
   description:
@@ -52,15 +51,19 @@ const dataStructure = {};
 
 const mergeFunction = (obj: dataUnitStructT, dataFn: Object) => {
   if (obj.data && Array.isArray(obj.data)) {
-    obj.data.forEach(box => dataFn.objInsert({ score: 0, ...box }, box.id));
+    obj.data.forEach(box =>
+      dataFn.objInsert({ score: 0, ...box, students: {} }, box.id)
+    );
   }
 };
 
 export default ({
   id: 'ac-brainstorm',
+  type: 'react-component',
   ActivityRunner,
   Dashboard,
   config,
+  configUI,
   meta,
   dataStructure,
   mergeFunction

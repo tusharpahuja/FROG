@@ -23,7 +23,7 @@ export type socialStructureT = {
   }
 };
 
-export type dataUnitT = Object | any[];
+export type dataUnitT = any;
 
 export type dataUnitStructT = { config: Object, data: dataUnitT };
 
@@ -47,42 +47,50 @@ export type ActivityRunnerT = {
   activityData: dataUnitStructT,
   data: any,
   dataFn: Object,
+  uploadFn: (files: Array<any>, callback: (string) => any) => void,
   userInfo: { id: string, name: string }
 };
 
+export type validateConfigFnT = Object => null | { field: string, err: string };
+
 export type ActivityPackageT = {
   id: string,
+  type: 'react-component',
   meta: {
-    type: string,
     name: string,
     shortDesc: string,
-    description: string
+    description: string,
+    exampleData: Array<any>
   },
   config: Object,
+  validateConfig?: validateConfigFnT[],
   mergeFunction?: (dataUnitStructT, Object) => void,
   ActivityRunner: (x: ActivityRunnerT) => React$Component<*> | React$Element<*>
 };
 
 export type productOperatorT = {
   id: string,
+  type: 'product',
   meta: {
-    type: string,
     name: string,
     shortDesc: string,
     description: string
   },
   config: Object,
+  validateConfig?: validateConfigFnT[],
   operator: (configData: Object, object: ObjectT) => activityDataT
 };
 
 export type socialOperatorT = {
   id: string,
+  type: 'social',
   meta: {
-    type: string,
     name: string,
     shortDesc: string,
     description: string
   },
+  outputDefinition: string[] | ((config: Object) => string[]),
+  validateConfig?: validateConfigFnT[],
   config: Object,
   operator: (configData: Object, object: ObjectT) => socialStructureT
 };

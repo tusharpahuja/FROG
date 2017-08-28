@@ -21,6 +21,7 @@ import { Products } from '../imports/api/products.js';
 import { Objects } from '../imports/api/objects.js';
 import { GlobalSettings } from '../imports/api/global.js';
 import { Uploads } from '../imports/api/uploads.js';
+import { OpenUploads } from '../imports/api/openUploads.js';
 // import '../imports/api/engine.js';
 
 Meteor.publish('userData', () => Meteor.users.find({}));
@@ -36,5 +37,6 @@ Meteor.publish('objects', () => Objects.find({}));
 Meteor.publish('products', () => Products.find({}));
 Meteor.publish('sessions', () => Sessions.find({}));
 Meteor.publish('uploads', () => Uploads.find({}));
+Meteor.publish('openUploads', () => OpenUploads.find({}));
 
 startShareDB();

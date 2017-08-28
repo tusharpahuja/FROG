@@ -1,126 +1,23 @@
 // @flow
 
-import React, { Component } from 'react';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-import { Accounts } from 'meteor/accounts-base';
+import React from 'react';
 import sharedbClient from 'sharedb/lib/client';
 import ReconnectingWebSocket from 'reconnectingwebsocket';
-import { every } from 'lodash';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
-import Body from './Body.jsx';
-import Navigation from './Navigation';
+import FROGRouter from './FROGRouter';
 
-const DEFAULT_PASSWORD = '123456';
-const connectWithDefaultPwd = username =>
-  Meteor.loginWithPassword(username, DEFAULT_PASSWORD);
-
-export const apps = {
-  home: 'Home',
-  admin: 'Admin',
-  graph: 'Graph Editor',
-  teacher: 'Teacher View',
-  student: 'Student View'
-};
-
-const socket = new ReconnectingWebSocket('ws://localhost:3002');
+const shareDbUrl =
+  (Meteor.settings && Meteor.settings.public.sharedburl) ||
+  'ws://localhost:3002';
+const socket = new ReconnectingWebSocket(shareDbUrl);
 export const connection = new sharedbClient.Connection(socket);
 window.connection = connection;
 
-// App component - represents the whole app
-export default class App extends Component {
-  state: { app: string, username: string };
-
-  constructor() {
-    super();
-    this.state = { app: 'home', username: '' };
-    Meteor.subscribe('userData', { onReady: this.handleNewHash });
-  }
-
-  handleNewHash = () => {
-    const [, username, location] = window.location.hash.split('/');
-    if (window.location.pathname.split('/')[1] !== 'api') {
-      if (username) {
-        if (!Meteor.users.findOne({ username })) {
-          Accounts.createUser({ username, password: DEFAULT_PASSWORD }, () =>
-            connectWithDefaultPwd(username)
-          );
-        } else {
-          connectWithDefaultPwd(username);
-        }
-      }
-      this.setState({ username });
-      if (username !== 'teacher') {
-        this.setState({ app: 'student' });
-      } else if (location && apps[location]) {
-        this.setState({ app: location });
-      }
-    }
-  };
-
-  componentDidMount = () => {
-    window.addEventListener('hashchange', this.handleNewHash, false);
-  };
-
-  render() {
-    return (
-      <PageContainer
-        username={this.state.username === undefined ? '' : this.state.username}
-        apps={apps}
-        currentApp={this.state.app === undefined ? '' : this.state.app}
-      />
-    );
-  }
-}
-
-const Page = (props: {
-  username: string,
-  currentApp: string,
-  apps: {},
-  ready: boolean
-}) => {
-  if (!props.ready) return <div id="app" />;
-  return (
-    <div id="app">
-      {props.username === 'teacher' &&
-        <div id="header">
-          <Navigation
-            username={props.username}
-            apps={props.apps}
-            currentApp={props.currentApp}
-          />
-        </div>}
-      <div id="body">
-        <Body app={props.currentApp} />
-      </div>
+export default () =>
+  <Router>
+    <div style={{ width: '100%', height: '100%' }}>
+      <Route component={FROGRouter} />
     </div>
-  );
-};
-
-const setupSubscriptions = (collections: string[]) => {
-  const subscriptions = collections.map(x => Meteor.subscribe(x));
-  return every(subscriptions.map(x => x.ready()), Boolean);
-};
-
-export const PageContainer = createContainer((props: { username: string }) => {
-  let ready = setupSubscriptions([
-    'activity_data',
-    'logs',
-    'activities',
-    'objects',
-    'sessions'
-  ]);
-  if (props.username === 'teacher') {
-    ready =
-      ready &&
-      setupSubscriptions([
-        'operators',
-        'connections',
-        'global_settings',
-        'graphs',
-        'products',
-        'uploads'
-      ]);
-  }
-  return { ...props, ready };
-}, Page);
+  </Router>;

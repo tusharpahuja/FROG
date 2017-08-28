@@ -13,7 +13,7 @@ export default ({
   hasPreview,
   onPreview,
   searchS
-}) =>
+}: any) =>
   <div className="list-group-item">
     <div style={{ marginLeft: '35px' }}>
       <h5 style={{ fontWeight: 'bold' }}>
@@ -25,7 +25,7 @@ export default ({
       {showExpanded &&
         <div style={{ width: '87%' }}>
           <i>
-            {object.meta.description}
+            <Highlight text={object.meta.description} searchStr={searchS} />
           </i>
         </div>}
     </div>
@@ -47,7 +47,7 @@ export default ({
           position: 'absolute',
           right: '2px',
           top: '4px',
-          width: '9%',
+          width: '10%',
           height: '35px'
         }}
         className="glyphicon glyphicon-menu-down"
@@ -62,7 +62,7 @@ export default ({
           position: 'absolute',
           right: '2px',
           top: '39px',
-          width: '9%',
+          width: '10%',
           height: '34px'
         }}
         onClick={onPreview}

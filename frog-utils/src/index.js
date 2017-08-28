@@ -3,6 +3,7 @@ import React from 'react';
 
 import { compose, withHandlers, withState } from 'recompose';
 
+export { default as EnhancedForm, hideConditional } from './EnhancedForm';
 export { generateReactiveFn, inMemoryReactive } from './generateReactiveFn';
 export { Highlight } from './highlightSubstring';
 export { default as uuid } from 'cuid';
@@ -10,6 +11,8 @@ export { default as colorRange } from './colorRange';
 export { default as unrollProducts } from './unrollProducts';
 export { default as TimedComponent } from './TimedComponent';
 export { TextInput, ChangeableText } from './TextInput';
+export { default as dataURItoFile } from './URLtoFile';
+export { default as resizeDataURL } from './resizeDataURL';
 export {
   mergeSocialStructures,
   focusStudent,
@@ -90,3 +93,28 @@ export const withVisibility = compose(
     toggleVisibility: ({ setVisibility }) => () => setVisibility(n => !n)
   })
 );
+
+export const flattenOne = (ary: any[]): any[] =>
+  ary.reduce(
+    (acc: any[], x: any) => (Array.isArray(x) ? [...acc, ...x] : [...acc, x]),
+    []
+  );
+
+export const wordWrap = (text: string, maxLength: number): string[] => {
+  const result = [];
+  let line = [];
+  let length = 0;
+  text.split(' ').forEach(word => {
+    if (length + word.length >= maxLength) {
+      result.push(line.join(' '));
+      line = [];
+      length = 0;
+    }
+    length += word.length + 1;
+    line.push(word);
+  });
+  if (line.length > 0) {
+    result.push(line.join(' '));
+  }
+  return result;
+};

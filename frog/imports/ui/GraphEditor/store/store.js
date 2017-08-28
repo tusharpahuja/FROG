@@ -65,12 +65,21 @@ export default class Store {
   @observable history = [];
   @observable readOnly: boolean;
   @observable graphErrors: any[] = [];
+  @observable valid: any;
+  browserHistory: any;
+  url: string;
 
   @observable graphDuration: number = 120;
 
   set state(newState: StateT) {
     this._state = newState;
   }
+
+  @action
+  setBrowserHistory = (history: any, url: string = '/graph') => {
+    this.browserHistory = history;
+    this.url = url;
+  };
 
   @computed
   get state(): StateT {
@@ -118,6 +127,10 @@ export default class Store {
 
   @action
   setId = (id: string, readOnly: boolean = false): void => {
+    const desiredUrl = `${this.url}/${id}`;
+    if (this.browserHistory.location.pathname !== desiredUrl) {
+      this.browserHistory.push(desiredUrl);
+    }
     setCurrentGraph(id);
     const graph = Graphs.findOne(id);
 
@@ -190,15 +203,18 @@ export default class Store {
       this.history.push(newEntry);
       mergeGraph(this.objects);
     }
+    this.refreshValidate();
+  };
 
-    this.graphErrors = sortBy(
-      valid(
-        Activities.find({ graphId: this.graphId }).fetch(),
-        Operators.find({ graphId: this.graphId }).fetch(),
-        Connections.find({ graphId: this.graphId }).fetch()
-      ),
-      'severity'
+  @action
+  refreshValidate = () => {
+    const validData = valid(
+      Activities.find({ graphId: this.graphId }).fetch(),
+      Operators.find({ graphId: this.graphId }).fetch(),
+      Connections.find({ graphId: this.graphId }).fetch()
     );
+    this.graphErrors = sortBy(validData.errors, 'severity');
+    this.valid = validData;
 
     Graphs.update(this.graphId, {
       $set: {
