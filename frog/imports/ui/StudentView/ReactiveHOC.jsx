@@ -94,7 +94,7 @@ const ReactiveHOC = (
             data={this.state.data}
             {...this.props}
           />
-        : <img src="/images/Loading.gif" />;
+        : <img src="/images/Loading.gif" alt="" />;
   }
   ReactiveComp.displayName = `ReactiveHOC(${getDisplayName(WrappedComponent)})`;
   return ReactiveComp;
