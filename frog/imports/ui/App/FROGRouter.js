@@ -24,7 +24,7 @@ const Page = ({ isNotLoggedIn, isRedirect, isStudent, path, ready }) => {
     return <NotLoggedIn />;
   }
   if (!ready) {
-    return <p>Loading...</p>;
+    return <img src="/images/Loading.gif" />;
   }
   if (isRedirect) {
     return <Redirect to={path} />;
