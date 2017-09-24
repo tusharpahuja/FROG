@@ -2,12 +2,15 @@
 import React from 'react';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import ResizeAware from 'react-resize-aware';
-import { withState } from 'recompose';
+import { withState, compose } from 'recompose';
 import { type ActivityRunnerT } from 'frog-utils';
 
 import ObservationContainer from './obs_container';
 import ObservationDetail from './obs_detail';
 import Quadrants from './Quadrants';
+import { Plus } from './Plus';
+import AddBox from './AddBox';
+import { uuid } from 'frog-utils';
 
 const BoardPure = ({
   activityData: { config },
@@ -16,7 +19,9 @@ const BoardPure = ({
   width,
   height,
   info,
-  setInfo
+  setInfo,
+  newOpen,
+  setOpen
 }) => {
   const scaleX = 1000 / width;
   const scaleY = 1000 / height;
@@ -25,6 +30,21 @@ const BoardPure = ({
   const setXY = (i, ui) => {
     dataFn.objInsert((ui.x + offsetWidth) * scaleX, [i, 'x']);
     dataFn.objInsert((ui.y + offsetHeight) * scaleY, [i, 'y']);
+  };
+
+  const submitFn = item => {
+    setOpen(false);
+    if (item) {
+      const items = item.split(';').map(f => f.trim());
+      items.forEach(it =>
+        dataFn.listAppend({
+          id: uuid,
+          title: it,
+          x: Math.random() * 800,
+          y: -(Math.random() * 800)
+        })
+      );
+    }
   };
 
   const List = data.map((y, i) =>
@@ -38,6 +58,7 @@ const BoardPure = ({
         content={y.content}
         x={y.x / scaleX - offsetWidth}
         y={y.y / scaleY - offsetHeight}
+        delBox={() => dataFn.listDel(y, i)}
       />
     </div>
   );
@@ -62,12 +83,17 @@ const BoardPure = ({
             content={info.content}
             closeInfoFn={() => setInfo(null)}
           />}
+        <Plus scaleX={scaleX} scaleY={scaleY} openFn={() => setOpen(true)} />
+        {newOpen && <AddBox submitFn={submitFn} />}
       </div>
     </MuiThemeProvider>
   );
 };
 
-const Board = withState('info', 'setInfo', null)(BoardPure);
+const Board = compose(
+  withState('info', 'setInfo', null),
+  withState('newOpen', 'setOpen', false)
+)(BoardPure);
 
 export default (props: ActivityRunnerT) =>
   <ResizeAware style={{ position: 'relative', height: '100%', width: '100%' }}>

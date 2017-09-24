@@ -50,6 +50,15 @@ Meteor.methods({
     }
   },
   'frog.studentlist': function(slug) {
-    return Sessions.findOne({ slug: slug.trim().toUpperCase() }).studentlist;
+    if (!slug) {
+      console.log('no slug');
+      return undefined;
+    }
+    const session = Sessions.findOne({ slug: slug.trim().toUpperCase() });
+    if (!session) {
+      console.log('no session');
+      return undefined;
+    }
+    return session.studentlist;
   }
 });

@@ -77,7 +77,7 @@ const operator = (
       const f = x.split(',');
       return { ...acc, [f[0]]: f.slice(1).map(z => z.trim()) };
     }, {});
-  const groupnames = configData.groupnames.split(',');
+  const groupnames = configData.groupnames.split(',').map(f => f.trim());
   const studentStruct = studentIds.reduce((acc, stud) => {
     const mapping = studentmapping[students[stud]] || defaultMapping;
     const attribs = groupnames.reduce(
@@ -91,7 +91,7 @@ const operator = (
 };
 
 const outputDefinition = configData =>
-  configData.defaultgroup.split(',').map(f => f.trim());
+  configData.groupnames.split(',').map(f => f.trim());
 
 export default ({
   id: 'op-social-name',

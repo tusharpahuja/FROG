@@ -42,7 +42,7 @@ const mergeData = (activityId: string, object: ObjectT, group?: string) => {
           doc.create(
             activityType.dataStructure !== undefined
               ? cloneDeep(activityType.dataStructure)
-              : {}
+              : { __empty: true }
           );
         }
         if (mergeFunction) {
@@ -67,7 +67,9 @@ const mergeData = (activityId: string, object: ObjectT, group?: string) => {
   mergedLogsDoc.on('load', () => {
     if (!mergedLogsDoc.type) {
       mergedLogsDoc.create(
-        (activityType.dashboard && activityType.dashboard.initData) || {}
+        (activityType.dashboard && activityType.dashboard.initData) || {
+          __empty: true
+        }
       );
     }
     mergedLogsDoc.destroy();
