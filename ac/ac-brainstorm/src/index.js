@@ -5,6 +5,7 @@ import { type dataUnitStructT, type ActivityPackageT } from 'frog-utils';
 import { config, configUI } from './config';
 import ActivityRunner from './ActivityRunner';
 import Dashboard from './Dashboard';
+import { isEqual } from 'lodash';
 
 const listItems = [
   { id: '1', score: 0, title: 'AirBnB', content: 'Uber for hotels' },
@@ -50,10 +51,17 @@ const meta = {
 const dataStructure = {};
 
 const mergeFunction = (obj: dataUnitStructT, dataFn: Object) => {
+  console.log('objdata', obj.data);
   if (obj.data && Array.isArray(obj.data)) {
-    obj.data.forEach(box =>
-      dataFn.objInsert({ score: 0, ...box, students: {} }, box.id)
-    );
+    obj.data.forEach(boxw => {
+      Object.values(boxw) &&
+        Object.values(boxw).map(box => {
+          console.log(box);
+          if (box && !isEqual(box, {})) {
+            dataFn.objInsert({ score: 0, ...box, students: {} }, box.id);
+          }
+        });
+    });
   }
 };
 

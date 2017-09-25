@@ -75,24 +75,22 @@ class FROGRouter extends Component {
     const hasLogin = query.login;
 
     if (this.state.mode !== 'loggingIn') {
-      if (process.env.NODE_ENV !== 'production') {
-        const username = query.login;
-        if (username) {
-          this.setState({ mode: 'loggingIn' });
-          Meteor.call('frog.debuglogin', username, (err, id) => {
-            subscriptionCallback(err, id, x => this.setState({ mode: x }));
-          });
-        }
+      const username = query.login;
+      if (username) {
+        this.setState({ mode: 'loggingIn' });
+        Meteor.call('frog.debuglogin', username, (err, id) => {
+          subscriptionCallback(err, id, x => this.setState({ mode: x }));
+        });
+      }
 
-        const token = query.token;
-        if (token) {
-          this.setState({ mode: 'loggingIn' });
-          Meteor.call('frog.teacherlogin', token.trim(), (err, id) =>
-            subscriptionCallback(err, id, x => {
-              this.setState({ mode: x });
-            })
-          );
-        }
+      const token = query.token;
+      if (token) {
+        this.setState({ mode: 'loggingIn' });
+        Meteor.call('frog.teacherlogin', token.trim(), (err, id) =>
+          subscriptionCallback(err, id, x => {
+            this.setState({ mode: x });
+          })
+        );
       }
 
       if (!hasLogin && this.state.mode !== 'ready') {

@@ -31,14 +31,12 @@ const doLogin = (user, self) => {
   return result;
 };
 
-if (process.env.NODE_ENV !== 'production') {
-  Meteor.methods({
-    'frog.debuglogin': function(user) {
-      const self = this;
-      return doLogin(user, self);
-    }
-  });
-}
+Meteor.methods({
+  'frog.debuglogin': function(user) {
+    const self = this;
+    return doLogin(user, self);
+  }
+});
 
 Meteor.methods({
   'frog.teacherlogin': function(token) {

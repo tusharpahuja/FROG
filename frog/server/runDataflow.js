@@ -77,6 +77,7 @@ const runDataflow = (
   );
 
   // Extract the product
+  const prodall = allProducts.filter(c => c.type === 'product');
   const prod = allProducts.find(c => c.type === 'product');
   const activityData: activityDataT =
     prod && prod.activityData
@@ -102,7 +103,7 @@ const runDataflow = (
 
   if (type === 'operator') {
     const operatorFunction = operatorTypesObj[node.operatorType].operator;
-    const product = Promise.await(operatorFunction(node.data, object));
+    const product = Promise.await(operatorFunction(node.data, object, prodall));
     const dataType = {
       product: 'activityData',
       social: 'socialStructure',

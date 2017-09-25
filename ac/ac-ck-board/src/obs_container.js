@@ -18,7 +18,7 @@ const ObservationContainer = ({
   const scaleText = (scaleX + scaleY) / 2;
   const style = {
     height: 30 / scaleY,
-    width: title.length * 10 / scaleX,
+    width: title.length * 12 / scaleX,
     margin: 10 / scaleText,
     textAlign: 'center',
     display: 'inline-block'
