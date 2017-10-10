@@ -21,10 +21,11 @@ class Doc {
   }
 
   bindTextField(ref, path) {
-    const binding = new StringBinding(ref, this.doc, [
-      ...cleanPath(this.path, path),
-      0
-    ]);
+    const binding = new StringBinding(
+      ref,
+      this.doc,
+      cleanPath(this.path, path)
+    );
     binding.setup();
     return binding;
   }

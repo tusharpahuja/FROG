@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import React, { Component } from 'react';
 
 import { compose, withHandlers, withState } from 'recompose';
 import { shuffle } from 'lodash';
@@ -132,3 +132,46 @@ export const wordWrap = (text: string, maxLength: number): string[] => {
 
 const groupchars = 'ABCDEFGHIJKLMNOPQRSTUWXYZ123456789'.split('');
 export const getSlug = (n: number) => shuffle(groupchars).slice(0, n).join('');
+
+export class ReactiveText extends Component {
+  textRef: any;
+
+  constructor(props: { path: string | array, dataFn: Object }) {
+    super(props);
+  }
+
+  update = props => {
+    this.setState({ path: props.path, dataFn: props.dataFn });
+    if (this.binding) {
+      this.binding.destroy();
+    }
+    this.binding = props.dataFn.bindTextField(this.textRef, 'text');
+  };
+
+  componentDidMount() {
+    this.update(this.props);
+  }
+
+  componentWillReceiveProps(nextProps) {
+    if (
+      (nextProps.doc && nextProps.doc.id) !==
+        (this.props.doc && this.props.dataFn.id) ||
+      this.props.path !== nextProps.path
+    ) {
+      this.update(nextProps);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.binding) {
+      this.binding.destroy();
+    }
+  }
+
+  render() {
+    const { path, dataFn, ...rest } = this.props;
+    return (
+      <textarea {...rest} ref={ref => (this.textRef = ref)} defaultValue="" />
+    );
+  }
+}

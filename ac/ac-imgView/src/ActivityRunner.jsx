@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import styled from 'styled-components';
 import Mousetrap from 'mousetrap';
-import type { ActivityRunnerT } from 'frog-utils';
+import { type ActivityRunnerT, ReactiveText } from 'frog-utils';
 
 import ThumbList from './components/ThumbList';
 import TopBar from './components/TopBar';
@@ -31,8 +31,6 @@ class ActivityRunner extends Component {
   categories: {
     [categoryName: string]: string[]
   };
-  textBinding: any;
-  textRef: any;
 
   constructor(props: ActivityRunnerT) {
     super(props);
@@ -66,12 +64,7 @@ class ActivityRunner extends Component {
     };
   }
 
-  componentDidMount() {
-    this.props.dataFn.bindText(this.textRef, 'text');
-  }
-
   componentWillUnmount() {
-    this.textBinding.destroy();
     Mousetrap.unbind('esc');
   }
 
@@ -113,6 +106,9 @@ class ActivityRunner extends Component {
           canVote={activityData.config.canVote}
           {...{ setCategory, setZoom }}
         />
+        <h1>
+          {this.props.data.text}
+        </h1>
         {images.length === 0 && this.state.category !== 'categories'
           ? <h1>
               Please upload images by dropping files on the button below, or
@@ -133,7 +129,7 @@ class ActivityRunner extends Component {
               canVote={activityData.config.canVote}
               showingCategories={this.state.category === 'categories'}
             />}
-        <textarea ref={ref => (this.textRef = ref)} />
+        <ReactiveText dataFn={dataFn} path="text" />
         {this.state.category !== 'categories' &&
           this.state.zoomOn &&
           <ZoomView
