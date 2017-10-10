@@ -1,5 +1,7 @@
 // @flow
 import ShareDB from 'sharedb';
+import StringBinding from 'sharedb-string-binding';
+
 import { uuid } from './index';
 
 type rawPathT = string | string[];
@@ -17,6 +19,16 @@ class Doc {
     this.doc = doc;
     this.path = path || [];
   }
+
+  bindTextField(ref, path) {
+    const binding = new StringBinding(ref, this.doc, [
+      ...cleanPath(this.path, path),
+      0
+    ]);
+    binding.setup();
+    return binding;
+  }
+
   listPrepend(newVal: any, path: rawPathT) {
     this.doc.submitOp({ p: [...cleanPath(this.path, path), 0], li: newVal });
   }

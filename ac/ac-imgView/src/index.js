@@ -99,7 +99,7 @@ const configUI = {
   groupingKey: { conditional: 'grouping' }
 };
 
-const dataStructure = {};
+const dataStructure = { text: '' };
 
 const mergeFunction = (object, dataFn) => {
   if (object.config.images)

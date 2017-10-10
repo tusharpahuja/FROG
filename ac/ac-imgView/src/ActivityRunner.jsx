@@ -31,6 +31,8 @@ class ActivityRunner extends Component {
   categories: {
     [categoryName: string]: string[]
   };
+  textBinding: any;
+  textRef: any;
 
   constructor(props: ActivityRunnerT) {
     super(props);
@@ -64,7 +66,12 @@ class ActivityRunner extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.dataFn.bindText(this.textRef, 'text');
+  }
+
   componentWillUnmount() {
+    this.textBinding.destroy();
     Mousetrap.unbind('esc');
   }
 
@@ -126,6 +133,7 @@ class ActivityRunner extends Component {
               canVote={activityData.config.canVote}
               showingCategories={this.state.category === 'categories'}
             />}
+        <textarea ref={ref => (this.textRef = ref)} />
         {this.state.category !== 'categories' &&
           this.state.zoomOn &&
           <ZoomView
