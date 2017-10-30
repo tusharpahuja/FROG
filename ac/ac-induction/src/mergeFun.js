@@ -3,11 +3,6 @@ import { shuffle } from 'lodash';
 import { arrayIncludes, stringToArray } from './ArrayFun';
 
 export default (obj: Object, dataFn: Object) => {
-  dataFn.objInsert(0, 'indexPart');
-  dataFn.objInsert(0, 'indexCurrent');
-  dataFn.objInsert(false, 'feedbackOpen');
-  dataFn.objInsert(true, 'testChoice');
-
   const {
     hasExamples,
     nbExamples,
@@ -39,10 +34,15 @@ export default (obj: Object, dataFn: Object) => {
   parts.push('End');
   dataFn.objInsert(parts, 'parts');
 
+  dataFn.objInsert(0, 'indexPart');
+  dataFn.objInsert(0, 'indexCurrent');
+  dataFn.objInsert(false, 'feedbackOpen');
+  dataFn.objInsert(true, 'testChoice');
+
   const suffisants = [];
   const tmp = new Set();
   let tmpNb = 0;
-  suffisantSets.split('').forEach(x => {
+  if (suffisantSets !== undefined) suffisantSets.split('').forEach(x => {
     if (x === '{') {
       tmp.clear();
     } else if (x === '}') {
