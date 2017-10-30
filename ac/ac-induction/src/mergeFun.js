@@ -42,20 +42,21 @@ export default (obj: Object, dataFn: Object) => {
   const suffisants = [];
   const tmp = new Set();
   let tmpNb = 0;
-  if (suffisantSets !== undefined) suffisantSets.split('').forEach(x => {
-    if (x === '{') {
-      tmp.clear();
-    } else if (x === '}') {
-      tmp.add(tmpNb);
-      suffisants.push([...tmp]);
-      tmpNb = 0;
-    } else if (x === ',' && !arrayIncludes(suffisants, [...tmp])) {
-      tmp.add(tmpNb);
-      tmpNb = 0;
-    } else if ('1234567890'.split('').includes('' + x)) {
-      tmpNb = Number('' + tmpNb + x);
-    }
-  });
+  if (suffisantSets !== undefined)
+    suffisantSets.split('').forEach(x => {
+      if (x === '{') {
+        tmp.clear();
+      } else if (x === '}') {
+        tmp.add(tmpNb);
+        suffisants.push([...tmp]);
+        tmpNb = 0;
+      } else if (x === ',' && !arrayIncludes(suffisants, [...tmp])) {
+        tmp.add(tmpNb);
+        tmpNb = 0;
+      } else if ('1234567890'.split('').includes('' + x)) {
+        tmpNb = Number('' + tmpNb + x);
+      }
+    });
   dataFn.objInsert(suffisants, 'suffisants');
 
   dataFn.objInsert(stringToArray(contradictoryProperties), 'contradictories');
