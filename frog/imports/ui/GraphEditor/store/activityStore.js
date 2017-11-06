@@ -47,6 +47,25 @@ export default class ActivityStore {
 
   @observable all: any = [];
 
+  @action
+  getActualTimes() {
+    const act = this.all.reduce(
+      (acc, x) => ({ ...acc, [x.id]: Activities.findOne(x.id) }),
+      {}
+    );
+    const minTime = minBy(Object.values(act), 'actualStartingTime')
+      .actualStartingTime;
+    const maxTime = maxBy(Object.values(act), 'actualClosingTime')
+      .actualClosingTime;
+    store.changeDuration((maxTime - minTime) / 1000);
+    this.all.forEach(a => {
+      const activity = act[a.id];
+      a.startTime = (activity.actualStartingTime - minTime) / 1000;
+      a.length =
+        (activity.actualClosingTime - activity.actualStartingTime) / 1000;
+    });
+  }
+
   @computed
   get activityOffsets(): any {
     return [1, 2, 3].reduce(
