@@ -40,12 +40,13 @@ export default (
   };
   switch (caseAnswer) {
     case 0: // choose answer true
-      finalResult.result = isIncorrect ? 2 : 1;
+      finalResult.result = 1;
       finalResult.show = 3;
-      if (respectedRes.result) {
-        finalResult.propertiesIndex = respectedRes.properties; // incorrects & contains
-      } else if (answers.length === 0) {
+      if (isIncorrect) {
+        finalResult.result = 2;
         finalResult.show = 0;
+      } else if (respectedRes.result) {
+        finalResult.propertiesIndex = respectedRes.properties; // incorrects & contains
       } else if (contradictoryRes.result) {
         finalResult.propertiesIndex = answers; // incorrects & contains
       } else if (!suffisantRes.result) {
@@ -62,12 +63,13 @@ export default (
       }
       break;
     case 1: // choose answer false why incorrect
-      finalResult.result = !isIncorrect ? 2 : 1;
+      finalResult.result = 1;
       finalResult.show = 1;
-      if (respectedRes.result) {
-        finalResult.propertiesIndex = respectedRes.properties; // ? & contains
-      } else if (answers.length === 0) {
+      if (!isIncorrect) {
+        finalResult.result = 2;
         finalResult.show = 0;
+      } else if (respectedRes.result) {
+        finalResult.propertiesIndex = respectedRes.properties; // ? & contains
       } else if (arrayMinus(answers, contradictoryRes.properties).length > 0) {
         finalResult.propertiesIndex = arrayMinus(answers, contradictories); // corrects & contains
       } else {
@@ -78,13 +80,16 @@ export default (
     case 2: // choose answer false what's missing
       finalResult.result = !isIncorrect ? 2 : 1;
       finalResult.show = 2;
-      if (!respectedRes.result && answers.length > 0) {
+      if (!isIncorrect) {
+        finalResult.result = 2;
+        finalResult.show = 0;
+      } else if (!respectedRes.result) {
         finalResult.show = 3;
         finalResult.propertiesIndex = arrayMinus(
           answers,
           respectedRes.properties
         ); // ? & contains
-      } else if (contradictoryRes.result || answers.length === 0) {
+      } else if (contradictoryRes.result) {
         finalResult.propertiesIndex = contradictoryRes.properties; // corrects & doesn't contains
       } else if (!unnecessaryRes.result) {
         finalResult.propertiesIndex = unnecessaryRes.properties; // corrects & doesn't contains
@@ -94,8 +99,7 @@ export default (
       ) {
         finalResult.show = 3;
         finalResult.propertiesIndex = answers; // What to put here ???     (incorrects & contains)
-      } else if (!isIncorrect || answers.length === 0) finalResult.show = 0;
-      else {
+      } else {
         finalResult.result = 0;
         finalResult.show = 0;
       }

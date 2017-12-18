@@ -61,27 +61,23 @@ export default ({
               </h3>
             </TestCorrectionDiv>
           </div>
-          {result !== 0 && (
+          {result < 2 && (
             <div>
-              {result !== 1 && (
-                <div>
-                  {'You have selected that this image was ' +
-                    data['listIndexTestWithFeedback' + data.indexPart][
-                      data.indexCurrent
-                    ].selectedChoice +
-                    " but it wasn't"}
-                </div>
-              )}
-              <div>
-                You have selected the following properties :
-                <ul>
-                  {data['listIndexTestWithFeedback' + data.indexPart][
-                    data.indexCurrent
-                  ].selectedProperties.map(x => (
-                    <li key={x}>{properties[x]}</li>
-                  ))}
-                </ul>
-              </div>
+              You have selected the following properties :
+              <ul>
+                {data['listIndexTestWithFeedback' + data.indexPart][
+                  data.indexCurrent
+                ].selectedProperties.map(x => <li key={x}>{properties[x]}</li>)}
+              </ul>
+            </div>
+          )}
+          {result === 2 && (
+            <div>
+              {'You have selected that this image was ' +
+                data['listIndexTestWithFeedback' + data.indexPart][
+                  data.indexCurrent
+                ].selectedChoice +
+                " but it wasn't"}
             </div>
           )}
         </div>
@@ -104,9 +100,9 @@ export default ({
           />
         </div>
       </div>
-      {result !== 0 && (
+      {result === 1 && (
         <ChooseImg
-          {...{ show, propertiesIndex, examples }}
+          {...{ show, propertiesIndex, examples, properties }}
           currentIndex={
             data['listIndexTestWithFeedback' + data.indexPart][
               data.indexCurrent
@@ -127,14 +123,21 @@ const ChooseImg = ({
   show,
   propertiesIndex,
   examples,
+  properties,
   currentIndex
 }: Object) => {
   const str =
-    show < 2
-      ? 'An image can be part of the concept and contains the selected properties:'
-      : show > 2
-        ? 'An image can respect the selected properties and not be part of the concept:'
-        : 'An image can be part of the concept but not respect the selected properties:';
+    show === 1
+      ? "An image can be part of the concept and contains the property: ' " +
+        properties[propertiesIndex[0]] +
+        "'"
+      : show === 3
+        ? "An image can respect the property '" +
+          properties[propertiesIndex[0]] +
+          "' and not be part of the concept:"
+        : "An image can be part of the concept but not respect the  property: '" +
+          properties[propertiesIndex[0]] +
+          "'";
   const urls = examples
     .filter(
       (y, i) =>
