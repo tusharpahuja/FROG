@@ -202,6 +202,7 @@ export default class Store {
     if (this.readOnly || this.state.mode === 'readOnly') {
       return;
     }
+    console.log(this.history);
     const newEntry = [
       this.connectionStore.history,
       this.activityStore.history,
@@ -261,13 +262,15 @@ export default class Store {
   undo = () => {
     const [connections, activities, operators] =
       this.history.length > 1 ? this.history.pop() : this.history[0];
+    console.log(connections, activities, operators);
     this.activityStore.all = activities.map(
-      x => new Activity(x.plane, x.startTime, x.title, x.length, x.id)
+      x => new Activity(x.plane, x.startTime, x.rawTitle, x.length, x.id)
     );
     this.operatorStore.all = operators.map(
       x => new Operator(x.time, x.y, x.type, x.id, x.title)
     );
     this.connectionStore.all = connections.map(x => {
+      console.log(x);
       const source = this.findId(x.source);
       const target = this.findId(x.target);
       if (
@@ -282,6 +285,7 @@ export default class Store {
     });
 
     mergeGraph(this.objects);
+    console.log(this.history);
   };
 
   @action
