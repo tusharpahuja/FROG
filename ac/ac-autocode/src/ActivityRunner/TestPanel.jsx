@@ -52,7 +52,7 @@ const Feedback = ({ inputDesc, expected, received, error, stdout }) => (
 );
 
 const TestList = ({ tests, ...props }) => (
-  <ButtonList>
+  <ButtonList data-style="display: flex">
     <Debug key="debug" {...props} />
     {tests &&
       tests.map((test, index) => (

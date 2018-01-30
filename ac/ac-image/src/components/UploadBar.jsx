@@ -8,7 +8,7 @@ import UploadDragDrop from './UploadDragDrop';
 const UploadBar = (props: Object) => (
   <Main>
     <div style={{ width: '100%', height: '1px', backgroundColor: 'black' }} />
-    <Container>
+    <Container data-style="display: flex">
       <UploadDragDrop {...props} />
       <div style={{ width: '50%', display: 'flex', justifyContent: 'center' }}>
         <button

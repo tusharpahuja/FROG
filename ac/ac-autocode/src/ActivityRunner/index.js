@@ -30,7 +30,7 @@ export default class ActivityRunner extends Component {
   render() {
     const { config } = this.props.activityData;
     return (
-      <Main>
+      <Main data-style="display: flex">
         <Header config={config} style={{ width: '100%' }} />
         <Editor {...this.props} />
         <TestPanel

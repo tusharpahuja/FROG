@@ -103,7 +103,7 @@ class ActivityRunner extends Component {
       this.state.category === 'categories' && !activityData.config.hideCategory;
 
     return (
-      <Main>
+      <Main data-style="display: flex">
         <TopBar
           categories={[...Object.keys(this.categories), 'categories']}
           category={this.state.category}

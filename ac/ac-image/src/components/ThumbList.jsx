@@ -26,7 +26,7 @@ const ImageList = ({
   setIndex,
   logger
 }) => (
-  <Main>
+  <Main data-style="display: flex">
     {images.map((image, i) => {
       const onClick = e => {
         if (canVote && e.shiftKey) {

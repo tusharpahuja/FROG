@@ -49,6 +49,7 @@ const CategoryBox = ({
   logger: LogT => void
 }) => (
   <CategoryContainer
+    data-style="display: flex"
     onClick={() => {
       logger({ type: 'category.enter', value: category });
       setCategory(category);

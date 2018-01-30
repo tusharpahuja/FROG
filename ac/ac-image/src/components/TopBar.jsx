@@ -26,7 +26,7 @@ const TopBar = ({
 }: Object) => (
   <Main>
     <p style={{ fontSize: '22px' }}>{guidelines}</p>
-    <Body>
+    <Body data-style="display: flex">
       {!hideCategory &&
         Object.keys(categories).length > 2 && (
           <div>
