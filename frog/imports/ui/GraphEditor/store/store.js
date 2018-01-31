@@ -260,32 +260,24 @@ export default class Store {
 
   @action
   undo = () => {
-    const [connections, activities, operators] =
-      this.history.length > 1 ? this.history.pop() : this.history[0];
-    console.log(connections, activities, operators);
-    this.activityStore.all = activities.map(
-      x => new Activity(x.plane, x.startTime, x.rawTitle, x.length, x.id)
-    );
-    this.operatorStore.all = operators.map(
-      x => new Operator(x.time, x.y, x.type, x.id, x.title)
-    );
-    this.connectionStore.all = connections.map(x => {
-      console.log(x);
-      const source = this.findId(x.source);
-      const target = this.findId(x.target);
-      if (
-        source instanceof Connection ||
-        target instanceof Connection ||
-        !source ||
-        !target
-      ) {
-        throw 'Cannot find connection source/target, or source/target is a connection';
-      }
-      return new Connection(source, target, x._id);
-    });
-
-    mergeGraph(this.objects);
-    console.log(this.history);
+    if(this.history.length > 1){
+        const [connections, activities, operators] = this.history.pop()
+        this.activityStore = new ActivityStore()
+        this.operatorStore = new OperatorStore()
+        this.connectionStore = new ConnectionStore()
+        this.history[this.history.length-1][0].forEach(x => {
+          this.connectionStore.mongoAdd(x)
+        })
+        this.history[this.history.length-1][1].forEach(x => {
+          this.activityStore.mongoAdd(x)
+        })
+        this.history[this.history.length-1][2].forEach(x => {
+          this.connectionStore.mongoAdd(x)
+        })
+        mergeGraph(this.objects)
+        this.refreshValidate();
+        console.log(this.history);
+    }
   };
 
   @action

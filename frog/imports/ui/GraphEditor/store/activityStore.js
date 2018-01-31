@@ -168,7 +168,7 @@ export default class ActivityStore {
   mongoAdd = (x: any) => {
     if (!store.findId({ type: 'activity', id: x._id })) {
       this.all.push(
-        new Activity(x.plane, x.startTime, x.title, x.length, x._id, x.state)
+        new Activity(x.plane, x.startTime, x.rawTitle, x.length, x._id, x.state)
       );
     }
   };
