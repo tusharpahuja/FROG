@@ -1,6 +1,7 @@
 // @flow
 
 import * as React from 'react';
+import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { sortBy } from 'lodash';
 import { Mosaic } from 'react-mosaic-component';
@@ -68,15 +69,17 @@ const SessionBody = ({
         {session.countdownStartTime && <Countdown session={session} />}
         <ActivityContainer activities={activities} sessionId={session._id} />
       </div>
-      <div className="bootstrap">
-        <DashLink>
-          <a
-            href="/"
-            target="_blank"
-            className="glyphicon glyphicon-dashboard"
-          />
-        </DashLink>
-      </div>
+      {Meteor.user().username === 'teacher' && (
+        <div className="bootstrap">
+          <DashLink>
+            <a
+              href="/"
+              target="_blank"
+              className="glyphicon glyphicon-dashboard"
+            />
+          </DashLink>
+        </div>
+      )}
     </React.Fragment>
   );
 };
