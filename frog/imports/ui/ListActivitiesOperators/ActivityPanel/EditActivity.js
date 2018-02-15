@@ -12,11 +12,11 @@ import { activityTypesObj } from '/imports/activityTypes';
 
 // import { connect } from '../../store';
 import Modal from '../Helpers/ModalExport';
-import { ErrorList, ValidButton } from '../GraphEditor/Validator'; // '../../Validator' what to do ?
-import { RenameField } from '../GraphEditor/Rename'; // '../../Validator' what to do ?
+import { ErrorList, ValidButton } from '../../GraphEditor/Validator'; // '../../Validator' what to do ?
+import { RenameField } from '../../GraphEditor/Rename'; // '../../Validator' what to do ?
 import FileForm from '../Helpers/fileUploader';
 import { SelectAttributeWidget } from '../FormUtils';
-import ConfigForm from './Helpers/ConfigForm';
+import ConfigForm from '../Helpers/ConfigForm';
 
 const StreamSelect = ({ activity, targets, onChange }) => (
   <FormGroup controlId="selectGrouping">

@@ -4,9 +4,9 @@ import React from 'react';
 import FlexView from 'react-flexview';
 import { FormGroup, FormControl } from 'react-bootstrap';
 
-import { connect } from '../../store';
+// import { connect } from '../../store';
 
-export default connect(({ formContext, onChange, value = '' }) => {
+export default ({ formContext, onChange, value = '' }) => {
   const options = formContext.options.filter(
     x => x !== formContext.groupingKey
   );
@@ -45,4 +45,4 @@ export default connect(({ formContext, onChange, value = '' }) => {
       </FlexView>
     </FormGroup>
   );
-});
+};

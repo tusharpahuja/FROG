@@ -7,7 +7,7 @@ import { Button } from 'react-bootstrap';
 
 import ActivityLibrary from './ActivityLibrary';
 import ListComponent from '../Helpers/ListComponent';
-import Preview from '../Preview/Preview';
+import Preview from '../../Preview/Preview';
 // import { connect } from '../GraphEditor/store';
 
 type StateT = {

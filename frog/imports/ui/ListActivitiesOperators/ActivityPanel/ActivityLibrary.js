@@ -3,7 +3,7 @@ import React from 'react';
 
 import { addActivity } from '/imports/api/activities';
 import { ActivityLibrary } from '/imports/api/activityLibrary';
-import LibraryListComponent from './LibraryListComponent';
+import LibraryListComponent from '../Helpers/LibraryListComponent';
 
 export default ({ activityId, searchStr, store }: Object) => {
   const select = (activity: Object) => {

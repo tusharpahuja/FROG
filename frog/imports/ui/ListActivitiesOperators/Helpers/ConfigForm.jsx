@@ -10,7 +10,7 @@ import {
   SelectFormWidget,
   SelectActivityWidget,
   addSocialFormSchema
-} from './FormUtils';
+} from '../FormUtils';
 
 type ConfigFormPropsT = {
   node: Object,

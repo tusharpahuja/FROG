@@ -3,7 +3,7 @@ import * as React from 'react';
 import styled from 'styled-components';
 
 import { connect } from '../store';
-import ActivityPanel from '../ListActivitiesOperators/ActivityPanel';
+import ActivityPanel from '../../ListActivitiesOperators/ActivityPanel';
 import OperatorPanel from './OperatorPanel';
 
 export default connect(({ store: { ui: { selected, sidepanelOpen } } }) => {

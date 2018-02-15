@@ -4,9 +4,9 @@ import React from 'react';
 import FlexView from 'react-flexview';
 import { FormGroup, ControlLabel, FormControl } from 'react-bootstrap';
 
-import { connect } from '../../store';
+// import { connect } from '../../store';
 
-export default connect(({ activity, onChange, store: { valid } }) => (
+export default ({ activity, onChange, store: { valid } }) => (
   <FormGroup controlId="selectGrouping">
     <FlexView>
       <FlexView vAlignContent="center" marginRight="10px">
@@ -44,4 +44,4 @@ export default connect(({ activity, onChange, store: { valid } }) => (
       </FlexView>
     </FlexView>
   </FormGroup>
-));
+);
