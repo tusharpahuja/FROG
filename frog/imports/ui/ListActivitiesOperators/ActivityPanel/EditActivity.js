@@ -9,18 +9,14 @@ import { withState, compose } from 'recompose';
 import { ChangeableText, A, uuid } from 'frog-utils';
 
 import { activityTypesObj } from '/imports/activityTypes';
-import {
-  addActivity,
-  setStreamTarget,
-  setParticipation
-} from '/imports/api/activities';
-import { connect } from '../../store';
-import Modal from '../ModalExport';
-import { ErrorList, ValidButton } from '../../Validator';
-import { RenameField } from '../../Rename';
-import FileForm from '../fileUploader';
+
+// import { connect } from '../../store';
+import Modal from '../Helpers/ModalExport';
+import { ErrorList, ValidButton } from '../GraphEditor/Validator'; // '../../Validator' what to do ?
+import { RenameField } from '../GraphEditor/Rename'; // '../../Validator' what to do ?
+import FileForm from '../Helpers/fileUploader';
 import { SelectAttributeWidget } from '../FormUtils';
-import ConfigForm from '../ConfigForm';
+import ConfigForm from './Helpers/ConfigForm';
 
 const StreamSelect = ({ activity, targets, onChange }) => (
   <FormGroup controlId="selectGrouping">
@@ -78,8 +74,14 @@ const RawEditActivity = ({
   modalOpen,
   setModal,
   activity,
+  activitiesDBFn,
   ...props
 }) => {
+  const {
+    addActivity,
+    setStreamTarget,
+    setParticipation
+  } = activitiesDBFn
   const graphActivity = props.store.activityStore.all.find(
     act => act.id === activity._id
   );
@@ -251,9 +253,8 @@ const IconButton = ({ icon, legend, onClick }: Object) => (
   </Button>
 );
 
-const EditActivity = compose(
+export default compose(
   withState('advancedOpen', 'setAdvancedOpen', false),
   withState('reload', 'setReload', uuid()),
   withState('modalOpen', 'setModal', false)
 )(RawEditActivity);
-export default connect(EditActivity);

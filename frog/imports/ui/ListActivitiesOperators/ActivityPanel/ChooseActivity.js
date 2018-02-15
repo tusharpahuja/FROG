@@ -6,9 +6,9 @@ import { Activities } from '/imports/api/activities';
 import { Button } from 'react-bootstrap';
 
 import ActivityLibrary from './ActivityLibrary';
-import ListComponent from './ListComponent';
+import ListComponent from '../Helpers/ListComponent';
 import Preview from '../Preview/Preview';
-import { connect } from '../GraphEditor/store';
+// import { connect } from '../GraphEditor/store';
 
 type StateT = {
   expanded: ?string,
@@ -181,4 +181,4 @@ export class ChooseActivityType extends Component<PropsT, StateT> {
   }
 }
 
-export default connect(ChooseActivityType);
+export default ChooseActivityType;

@@ -179,3 +179,6 @@ Meteor.methods({
     Activities.remove(activityId);
   }
 });
+
+export const activitiesDBFn = {addActivity, setParticipation,
+  setStreamTarget, duplicateActivity, importActivity}
