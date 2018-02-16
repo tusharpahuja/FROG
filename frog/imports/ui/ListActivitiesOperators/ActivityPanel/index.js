@@ -8,11 +8,13 @@ import ChooseActivity from './ChooseActivity';
 import EditActivity from './EditActivity';
 
 type StateT = { // fake store
-  
+  // activity type
+  // config
 };
 
 // need props func to tell to the graphEditor when something is happening
 // or do everything in the graph from the DB
+
 class ActivityCreator extends Component<Object, StateT> {
   constructor(props) {
     super(props);

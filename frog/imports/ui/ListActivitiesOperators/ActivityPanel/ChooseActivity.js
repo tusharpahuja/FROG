@@ -39,6 +39,7 @@ export class ChooseActivityType extends Component<PropsT, StateT> {
   }
 
   render() {
+    console.log(this.props.store)
     const select = this.props.onSelect
       ? this.props.onSelect
       : activityType => {
