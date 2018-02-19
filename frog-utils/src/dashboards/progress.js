@@ -2,51 +2,64 @@
 /* eslint-disable react/no-array-index-key */
 
 import * as React from 'react';
-import { Chart } from 'react-google-charts';
+import {
+  LineChart,
+  CartesianGrid,
+  YAxis,
+  Tooltip,
+  Label,
+  Legend,
+  Line,
+  XAxis,
+  ResponsiveContainer
+} from 'recharts';
 import { type LogDBT, type ActivityDbT, TimedComponent } from 'frog-utils';
 
-export const LineChart = ({
-  title,
-  vAxis,
-  hAxis,
-  hLen,
-  rows
-}: {
-  title: string,
-  vAxis: string,
-  hAxis: string,
-  hLen: number,
-  rows: Array<Array<number>>
-}) => (
-  <Chart
-    chartType="LineChart"
-    rows={rows}
-    columns={[
-      { type: 'number', label: 'Time' },
-      { type: 'number', label: 'Progress' },
-      { type: 'number', label: 'Complete' }
-    ]}
-    width="100%"
-    height="300px"
-    options={{
-      title,
-      legend: { position: 'top' },
-      pointSize: 5,
-      vAxis: {
-        title: vAxis,
-        minValue: 0,
-        maxValue: 100,
-        viewWindow: { max: 100 },
-        gridlines: { color: 'transparent' }
-      },
-      hAxis: {
-        title: hAxis,
-        minValue: 0,
-        maxValue: hLen,
-        gridlines: { color: 'transparent' }
-      }
-    }}
-  />
+export const OurLineChart = ({ rows }: { rows: Array<Array<number>> }) => (
+  <LineChart data={rows} width={900} height={400}>
+    <XAxis dataKey="time" allowDecimals={false} domain={[0, 'dataMax']}>
+      <Label>Time Elapsed</Label>
+    </XAxis>
+    <YAxis domain={[0, 100]}>
+      <Label>Average Class Progress</Label>
+    </YAxis>
+    <Tooltip />
+    <Legend />
+    <Line type="monotone" dataKey="complete" stroke="#8884d8" />
+    <Line type="monotone" dataKey="progress" stroke="#82ca9d" /> />
+  </LineChart>
+
+  // title="Activity Progress"
+  // vAxis="Average Class Progress"
+  // hAxis="Time Elapsed"
+  // chartType="LineChart"
+  // rows={rows}
+  // columns={[
+  //   { type: 'number', label: 'Time' },
+  //   { type: 'number', label: 'Progress' },
+  //   { type: 'number', label: 'Complete' }
+  // ]}
+  // width="100%"
+  // height="300px"
+  // options={{
+  //   title,
+  //   legend: { position: 'top' },
+  //   pointSize: 5,
+  //   vAxis: {
+  //     title: vAxis,
+  //     minValue: 0,
+  //     maxValue: 100,
+  //     viewWindow: { max: 100 },
+  //     gridlines: { color: 'transparent' }
+  //   },
+  //   hAxis: {
+  //     title: hAxis,
+  //     minValue: 0,
+  //     maxValue: hLen,
+  //     gridlines: { color: 'transparent' }
+  //   }
+  // }}
+  // />
 );
 
 const TIMEWINDOW = 5;
@@ -56,23 +69,26 @@ const Viewer = TimedComponent((props: Object) => {
 
   const numWindow =
     activity.actualClosingTime === undefined
-      ? Math.ceil((timeNow - activity.actualStartingTime) / 1000 / TIMEWINDOW)
+      ? Math.ceil(
+          (timeNow - new Date(activity.actualStartingTime)) / 1000 / TIMEWINDOW
+        )
       : Math.ceil(
-          (activity.actualClosingTime - activity.actualStartingTime) /
+          (new Date(activity.actualClosingTime) -
+            new Date(activity.actualStartingTime)) /
             1000 /
             TIMEWINDOW
         );
-  const timingData = [[0, 0, 0]];
+  const timingData = [{ time: 0, progress: 0, complete: 0 }];
   const factor = 100 / Math.max(Object.keys(instances).length, 1);
   for (let i = 0, j = -1; i <= numWindow; i += 1) {
     if (i * TIMEWINDOW === (data.timing[j + 1] || [0])[0]) {
       j += 1;
     }
-    timingData.push([
-      i * TIMEWINDOW / 60,
-      data.timing[j][1] * factor,
-      data.timing[j][2] * factor
-    ]);
+    timingData.push({
+      time: i * TIMEWINDOW / 60,
+      progress: data.timing[j][1] * factor,
+      complete: data.timing[j][2] * factor
+    });
   }
   const usersStarted = Object.keys(data.progress).length;
   const usersFinished = Object.keys(data.progress).filter(
@@ -81,7 +97,7 @@ const Viewer = TimedComponent((props: Object) => {
 
   return (
     <React.Fragment>
-      <LineChart
+      <OurLineChart
         title="Activity Progress"
         vAxis="Average Class Progress"
         hAxis="Time Elapsed"
@@ -129,7 +145,8 @@ const mergeLog = (
     dataFn.objInsert(log.value, ['progress', log.instanceId]);
 
     // $FlowFixMe
-    const timeDiff = (log.timestamp - activity.actualStartingTime) / 1000;
+    const timeDiff =
+      (new Date(log.timestamp) - new Date(activity.actualStartingTime)) / 1000;
     const timeWindow = Math.ceil(timeDiff / TIMEWINDOW) * TIMEWINDOW;
     if (timeWindow !== lastTimingItem[0]) {
       const newItem = [timeWindow, lastTimingItem[1], lastTimingItem[2]];
