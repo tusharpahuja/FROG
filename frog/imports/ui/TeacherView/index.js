@@ -81,8 +81,6 @@ const TeacherView = withTracker(() => {
     <div style={{ width: '80%' }}>
       <SessionController {...props} />
       <hr />
-      {props.students && <StudentList students={props.students} />}
-      <hr />
       <SessionList {...props} />
     </div>
   </div>

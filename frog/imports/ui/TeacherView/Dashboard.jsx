@@ -7,7 +7,7 @@ import Spinner from 'react-spinner';
 import { withState } from 'recompose';
 import { Nav, NavItem } from 'react-bootstrap';
 import styled from 'styled-components';
-
+import throttle from 'react-throttle-render';
 import { type ActivityDbT } from 'frog-utils';
 
 import { ErrorBoundary } from '../App/ErrorBoundary';
@@ -96,10 +96,11 @@ export class DashboardComp extends React.Component<
           {}
         )
       : {};
+    const Viewer = aT.dashboard.Viewer;
 
     return this.state.data ? (
       <div style={{ width: '100%' }}>
-        <aT.dashboard.Viewer
+        <Viewer
           users={users}
           activity={this.props.activity}
           instances={this.props.instances || []}
