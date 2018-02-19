@@ -40,7 +40,6 @@ if (process.env.NODE_ENV === 'production') {
   if (!Meteor.settings.token) {
     Meteor.settings.token = uuid();
   }
-  console.info('Meteor login token ', Meteor.settings.token);
   GlobalSettings.update(
     'token',
     { value: Meteor.settings.token },
