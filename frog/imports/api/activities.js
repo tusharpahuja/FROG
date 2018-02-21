@@ -17,20 +17,29 @@ export const addActivity = (
   activityType: string,
   data: ?Object = {},
   id: string,
-  groupingKey: ?string
+  groupingKey: ?string,
+  parentId: ?string
 ) => {
   if (id) {
-    const toSet = omitBy({ data, groupingKey }, isNil);
+    const toSet = omitBy({ activityType, parentId, data, groupingKey }, isNil);
     Activities.update(id, { $set: toSet });
   } else {
     Activities.insert({
       _id: uuid(),
+      parentId,
       activityType,
       data,
       groupingKey,
       createdAt: new Date()
     });
   }
+};
+
+export const setParticipation = (
+  activityId: string,
+  participationMode: string
+) => {
+  Activities.update(activityId, { $set: { participationMode } });
 };
 
 export const setStreamTarget = (activityId: string, target: string) => {
@@ -147,6 +156,16 @@ export const flushActivities = () => Meteor.call('activities.flush');
 Meteor.methods({
   'activities.flush': () => {
     Activities.remove({});
+  },
+  'get.activity.for.dashboard': id => {
+    if (Meteor.isServer) {
+      const activity = Activities.findOne(id);
+      const graph = Graphs.findOne(activity.graphId);
+      const users = Meteor.users
+        .find({ slug: graph.slug }, { fields: { username: 1 } })
+        .fetch();
+      return { activity, users };
+    }
   },
   'graph.flush.all': graphId => {
     Graphs.remove(graphId);

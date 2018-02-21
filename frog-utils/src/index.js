@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { compose, withHandlers, withState } from 'recompose';
 import { shuffle } from 'lodash';
 
@@ -67,7 +67,9 @@ export type {
   ControlT,
   ReactComponent,
   LogT,
-  LogDBT
+  LogDBT,
+  dashboardT,
+  dashboardViewerPropsT
 } from './types';
 export { CountChart, ScatterChart } from './DashboardComponents/CountChart';
 export {
@@ -75,6 +77,9 @@ export {
   toTableData
 } from './ActivityComponents/TableView';
 export { default as TreeView } from './ActivityComponents/TreeView';
+// Exports for Dashboards
+export { default as ProgressDashboard } from './dashboards/progress';
+export { default as LeaderBoard } from './dashboards/leaderboard';
 
 export const A = ({ onClick, children, ...rest }: any): any => (
   <a
@@ -125,7 +130,13 @@ export const zipList = (xs: Array<any>): Array<any> =>
 export const withVisibility = compose(
   withState('visible', 'setVisibility', false),
   withHandlers({
-    toggleVisibility: ({ setVisibility }) => () => setVisibility(n => !n)
+    toggleVisibility: ({ setVisibility }) => x => {
+      if (typeof x === 'boolean') {
+        setVisibility(x);
+      } else {
+        setVisibility(n => !n);
+      }
+    }
   })
 );
 

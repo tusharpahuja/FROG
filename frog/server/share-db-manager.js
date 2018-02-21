@@ -8,13 +8,14 @@ import http from 'http';
 import RedisPubsub from 'sharedb-redis-pubsub';
 
 declare var Promise: any;
+const server = http.createServer();
 
 const dbUrl =
   (Meteor.settings && Meteor.settings.sharedb_dburl) ||
   'mongodb://localhost:3001';
+
 const db = ShareDBMongo(`${dbUrl}/sharedb`);
 
-const server = http.createServer();
 let options = { db };
 if (Meteor.settings.sharedb_redis) {
   const redis = new RedisPubsub({
@@ -22,12 +23,23 @@ if (Meteor.settings.sharedb_redis) {
   });
   options = { ...options, pubsub: redis };
 }
-const backend = new ShareDB(options);
+
+let backend;
+try {
+  backend = new ShareDB(options);
+} catch (e) {
+  backend = new ShareDB({
+    ...options,
+    db: ShareDBMongo('mongodb://localhost:27017/sharedb')
+  });
+}
 export const serverConnection = backend.connect();
 
 export const startShareDB = () => {
   if (!Meteor.settings.dont_start_sharedb) {
-    new WebSocket.Server({ server }).on('connection', ws => {
+    const wserver = new WebSocket.Server({ server });
+    wserver.on('connection', ws => {
+      ws.on('error', () => null);
       backend.listen(new WebsocketJSONStream(ws));
     });
     // eslint-disable-next-line no-console

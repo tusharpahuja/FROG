@@ -1,20 +1,37 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import Spinner from 'react-spinner';
 import { every } from 'lodash';
 import { UserStatus } from 'meteor/mizzao:user-status';
+import styled from 'styled-components';
 
 import { Sessions } from '/imports/api/sessions';
+import { GlobalSettings } from '/imports/api/globalSettings';
 import SessionBody from './SessionBody';
 
 const once = { already: false };
 
-class StudentViewComp extends Component {
-  state: { result: string, message?: string };
+const DashLink = styled.div`
+  position: fixed;
+  bottom: 0px;
+  right: 0px;
+  font-size: 3em;
+  color: black;
+`;
+
+type StudentViewCompPropsT = {
+  match: Object,
+  token?: { value: string }
+};
+
+class StudentViewComp extends React.Component<
+  StudentViewCompPropsT,
+  { result: string, message?: string }
+> {
   constructor(props) {
     super(props);
     this.state = { result: 'notyet' };
@@ -60,7 +77,25 @@ class StudentViewComp extends Component {
         </div>
       );
     }
-    return <SessionBody />;
+    return (
+      <React.Fragment>
+        <SessionBody />
+        {Meteor.user() &&
+          Meteor.user().username === 'teacher' && (
+            <div className="bootstrap">
+              <DashLink>
+                <a
+                  href={`/?login=teacher&token=${(this.props.token &&
+                    this.props.token.value) ||
+                    ''}`}
+                  target="_blank"
+                  className="glyphicon glyphicon-dashboard"
+                />
+              </DashLink>
+            </div>
+          )}
+      </React.Fragment>
+    );
   }
 }
 
@@ -83,7 +118,7 @@ const monitor = () => {
   }
 };
 
-export default createContainer(props => {
+export default withTracker(props => {
   if (!once.already) {
     Tracker.autorun(() => {
       if (Meteor.userId()) {
@@ -95,10 +130,11 @@ export default createContainer(props => {
 
   const slug = props.match.params.slug.trim().toUpperCase();
 
-  const collections = ['session_activities'];
+  const collections = ['session_activities', 'globalSettings'];
   const subscriptions = collections.map(x => Meteor.subscribe(x, slug));
   return {
     session: Sessions.findOne({ slug }),
+    token: GlobalSettings.findOne('token'),
     ready: every(subscriptions.map(x => x.ready()), Boolean)
   };
-}, StudentViewComp);
+})(StudentViewComp);

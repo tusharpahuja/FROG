@@ -1,5 +1,5 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import ReactTooltip from 'react-tooltip';
 import { cloneDeep, uniqBy, range } from 'lodash';
 import Stringify from 'json-stable-stringify';
@@ -18,8 +18,6 @@ import { DashboardComp } from '../TeacherView/Dashboard';
 import ShowInfo from './ShowInfo';
 import createLogger, { Logs } from './createLogger';
 import ShowLogs from './ShowLogs';
-
-Modal.setAppElement('#render-target');
 
 const Icon = ({
   onClick,
@@ -127,12 +125,24 @@ export const StatelessPreview = withState('reload', 'setReload', '')(
 
     const reactiveDash = generateReactiveFn(dashboard);
 
+    const activityDbObject = {
+      _id: 'preview',
+      data: activityData.config,
+      groupingKey: 'group',
+      plane: 2,
+      startTime: 0,
+      actualStartingTime: new Date(Date.now()),
+      length: 3,
+      activityType: activityTypeId
+    };
+
     const mergeData = (log: LogDBT) => {
       if (activityType.dashboard && activityType.dashboard.mergeLog) {
         activityType.dashboard.mergeLog(
           cloneDeep(dashboard.data),
           reactiveDash,
-          log
+          log,
+          activityDbObject
         );
       }
     };
@@ -274,8 +284,12 @@ export const StatelessPreview = withState('reload', 'setReload', '')(
         <Nav bsStyle="pills" activeKey={example}>
           {examples &&
             examples.map((x, i) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <NavItem key={i} eventKey={i} onClick={() => setExample(i)}>
+              <NavItem
+                key={x.title}
+                className="examples"
+                eventKey={i}
+                onClick={() => setExample(i)}
+              >
                 {x.title}
               </NavItem>
             ))}
@@ -316,7 +330,7 @@ export const StatelessPreview = withState('reload', 'setReload', '')(
                 >
                   <DashboardComp
                     example={example}
-                    activity={{ activityType: activityType.id }}
+                    activity={activityDbObject}
                     config={activityData.config}
                     reload={reload}
                     doc={dashboard}
@@ -379,6 +393,7 @@ export const StatelessPreview = withState('reload', 'setReload', '')(
       </div>
     ) : (
       <Modal
+        ariaHideApp={false}
         contentLabel={'Preview of ' + activityType.id}
         isOpen
         onRequestClose={dismiss}

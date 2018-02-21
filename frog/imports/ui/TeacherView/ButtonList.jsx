@@ -4,7 +4,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { msToString } from 'frog-utils';
 import { TimeSync } from 'meteor/mizzao:timesync';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import Spinner from 'react-spinner';
 import downloadLog from './downloadLog';
 import { exportSession } from './exportComponent';
@@ -36,19 +36,21 @@ const CountdownPure = ({ startTime, length, currentTime }) => {
   );
 };
 
-const Countdown = createContainer(
-  props => ({ ...props, currentTime: TimeSync.serverTime() }),
-  CountdownPure
-);
+const Countdown = withTracker(props => ({
+  ...props,
+  currentTime: TimeSync.serverTime()
+}))(CountdownPure);
 
 const ButtonList = ({
   session,
   toggle,
-  setShowStudentList
+  setShowStudentList,
+  token
 }: {
   session: Object,
   toggle: Function,
-  setShowStudentList: Function
+  setShowStudentList: Function,
+  token?: { value: string }
 }) => {
   const buttons = [
     {
@@ -107,7 +109,10 @@ const ButtonList = ({
     {
       states: ['CREATED', 'STARTED', 'PAUSED'],
       type: 'primary',
-      onClick: () => restartSession(session),
+      onClick: () => {
+        restartSession(session);
+        toggle(false);
+      },
       text: 'Restart session'
     },
     {
@@ -191,7 +196,15 @@ const ButtonList = ({
           />
         )}
       <b style={{ marginLeft: '20px' }}>
-        session: <a href={`/${session.slug}`}>{session.slug}</a>
+        session:{' '}
+        <a
+          target="_blank"
+          href={`/projector/${session.slug}?login=teacher&token=${(token &&
+            token.value) ||
+            ''}`}
+        >
+          {session.slug}
+        </a>
       </b>
     </div>
   );

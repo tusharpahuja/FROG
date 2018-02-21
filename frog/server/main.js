@@ -20,6 +20,7 @@ import {
 import { Sessions } from '../imports/api/sessions.js';
 import { Products } from '../imports/api/products.js';
 import { Objects } from '../imports/api/objects.js';
+import { GlobalSettings } from '../imports/api/globalSettings.js';
 
 Meteor.users._ensureIndex('joinedSessions');
 Meteor.users._ensureIndex('services.frog.id');
@@ -40,7 +41,22 @@ if (process.env.NODE_ENV === 'production') {
     Meteor.settings.token = uuid();
   }
   console.info('Meteor login token ', Meteor.settings.token);
+  GlobalSettings.update(
+    'token',
+    { value: Meteor.settings.token },
+    { upsert: true }
+  );
 }
+
+Meteor.publish('globalSettings', function() {
+  const user = Meteor.user();
+  const username = user && user.username;
+  if (username !== 'teacher') {
+    return this.ready();
+  } else {
+    return GlobalSettings.find({});
+  }
+});
 
 Meteor.publish('userData', function() {
   const user = Meteor.user();
@@ -56,7 +72,9 @@ Meteor.publish('userData', function() {
 publishComposite('session_activities', function(slug) {
   return {
     find() {
-      return Meteor.users.find(this.userId);
+      return Meteor.users.find(this.userId, {
+        fields: { joinedSessions: 1, username: 1 }
+      });
     },
     children: [
       {
@@ -102,6 +120,20 @@ publishComposite('session_activities', function(slug) {
 });
 
 const checkActivity = (activityId, operators, connections, userid) => {
+  const act = Activities.findOne(activityId);
+  const uname = Meteor.users.findOne(userid).username;
+
+  if (uname === 'teacher' && act.plane !== 3) {
+    return false;
+  }
+  if (
+    act.plane === 3 &&
+    act.participationMode === 'projector' &&
+    uname !== 'teacher'
+  ) {
+    return false;
+  }
+
   const connectedNodes = connections
     .filter(x => x.target.id === activityId)
     .map(x => x.source.id);

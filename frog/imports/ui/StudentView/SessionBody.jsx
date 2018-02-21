@@ -1,7 +1,7 @@
 // @flow
 
-import React from 'react';
-import { createContainer } from 'meteor/react-meteor-data';
+import * as React from 'react';
+import { withTracker } from 'meteor/react-meteor-data';
 import { sortBy } from 'lodash';
 import { Mosaic } from 'react-mosaic-component';
 
@@ -47,15 +47,16 @@ const SessionBody = ({
   activities: Object[],
   session: Object
 }) => {
-  if (!activities || activities.length === 0) {
-    return <h1>No Activity</h1>;
+  if (!activities || !session || activities.length === 0) {
+    return <h1>No activity right now</h1>;
   }
   if (session.state === 'PAUSED') {
     return <h1>Paused</h1>;
   }
   return (
     <div style={{ height: '100%' }}>
-      {session.countdownStartTime && <Countdown session={session} />}
+      {session.countdownStartTime &&
+        session.countdownStartTime !== -1 && <Countdown session={session} />}
       <ActivityContainer activities={activities} sessionId={session._id} />
     </div>
   );
@@ -63,10 +64,7 @@ const SessionBody = ({
 
 SessionBody.displayName = 'SessionBody';
 
-export default createContainer(
-  () => ({
-    session: Sessions.findOne(),
-    activities: Activities.find().fetch()
-  }),
-  SessionBody
-);
+export default withTracker(() => ({
+  session: Sessions.findOne(),
+  activities: Activities.find().fetch()
+}))(SessionBody);

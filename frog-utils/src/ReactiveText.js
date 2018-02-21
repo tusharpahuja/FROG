@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { omit, isEqual } from 'lodash';
+import { get, omit, isEqual } from 'lodash';
 import { type LogT } from 'frog-utils';
 
 type ReactivePropsT = {
@@ -10,17 +10,18 @@ type ReactivePropsT = {
   logger?: LogT => void
 };
 
-export class ReactiveText extends Component {
+export class ReactiveText extends Component<ReactivePropsT, ReactivePropsT> {
   textRef: any;
   binding: any;
-  state: ReactivePropsT;
 
   update = (props: ReactivePropsT) => {
     this.setState({ path: props.path, dataFn: props.dataFn });
     if (this.binding) {
       this.binding.destroy();
     }
-    this.binding = props.dataFn.bindTextField(this.textRef, props.path);
+    if (!this.props.dataFn.readOnly) {
+      this.binding = props.dataFn.bindTextField(this.textRef, props.path);
+    }
   };
 
   componentDidMount() {
@@ -46,7 +47,7 @@ export class ReactiveText extends Component {
 
   log(msg: string, props?: ReactivePropsT) {
     const logger = props ? props.logger : this.props.logger;
-    if (logger) {
+    if (logger && !this.props.dataFn.readOnly) {
       logger({
         type: 'reactivetext.' + msg,
         itemId: JSON.stringify((props || this.props).path),
@@ -57,11 +58,16 @@ export class ReactiveText extends Component {
 
   render() {
     const rest = omit(this.props, ['logger', 'path', 'dataFn']);
+    if (this.props.dataFn.readOnly) {
+      rest.value = get(this.props.dataFn.doc.data, this.props.path);
+      rest.readOnly = true;
+      rest.defaultValue = undefined;
+    }
     return this.props.type === 'textarea' ? (
       <textarea
         ref={ref => (this.textRef = ref)}
-        {...rest}
         defaultValue=""
+        {...rest}
         onBlur={() => this.log('blur')}
         onFocus={() => this.log('focus')}
       />
@@ -69,8 +75,8 @@ export class ReactiveText extends Component {
       <input
         type="text"
         ref={ref => (this.textRef = ref)}
-        {...rest}
         defaultValue=""
+        {...rest}
         onBlur={() => this.log('blur')}
         onFocus={() => this.log('focus')}
       />

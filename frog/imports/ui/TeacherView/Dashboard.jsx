@@ -1,31 +1,43 @@
 // @flow
 
-import React, { Component } from 'react';
+import * as React from 'react';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import Spinner from 'react-spinner';
-
 import { withState } from 'recompose';
 import { Nav, NavItem } from 'react-bootstrap';
 import styled from 'styled-components';
 
+import { type ActivityDbT } from 'frog-utils';
+
+import { ErrorBoundary } from '../App/ErrorBoundary';
 import doGetInstances from '../../api/doGetInstances';
 import { Activities } from '../../api/activities';
 import { Objects } from '../../api/objects';
 import { activityTypesObj } from '../../activityTypes';
-import { connection } from '../App/index';
+import { connection } from '../App/connection';
 
 const Container = styled.div`
   display: flex;
   flex-direction: row;
 `;
 
-export class DashboardComp extends Component {
-  state: { data: any };
+type DashboardCompPropsT = {
+  doc?: any,
+  activity: ActivityDbT,
+  users: Array<{ _id: string | number, username: string }>,
+  instances: Array<string | number>,
+  config: Object
+};
+
+export class DashboardComp extends React.Component<
+  DashboardCompPropsT,
+  { data: any }
+> {
   doc: any;
   mounted: boolean;
 
-  constructor(props: Object) {
+  constructor(props: DashboardCompPropsT) {
     super(props);
     this.state = { data: null };
   }
@@ -36,9 +48,10 @@ export class DashboardComp extends Component {
   };
 
   init(props: Object) {
-    this.doc =
-      this.props.doc ||
-      (props.conn || connection).get('rz', 'DASHBOARD//' + props.activity._id);
+    const _conn = props.conn || connection || {};
+    const _doc = _conn.get('rz', 'DASHBOARD//' + props.activity._id);
+    this.doc = this.props.doc || _doc;
+
     this.doc.setMaxListeners(30);
     this.doc.subscribe();
     if (this.doc.type) {
@@ -84,11 +97,12 @@ export class DashboardComp extends Component {
         )
       : {};
 
-    return this.state.data !== null ? (
+    return this.state.data ? (
       <div style={{ width: '100%' }}>
         <aT.dashboard.Viewer
           users={users}
-          instances={this.props.instances}
+          activity={this.props.activity}
+          instances={this.props.instances || []}
           data={this.state.data}
           config={this.props.activity.data || this.props.config}
         />
@@ -99,26 +113,29 @@ export class DashboardComp extends Component {
   }
 }
 
-const Dashboard = createContainer(({ session, activity }) => {
+export const Dashboard = withTracker(({ session, activity, users }) => {
   const object = Objects.findOne(activity._id);
   const instances = doGetInstances(activity, object).groups;
   return {
-    users: Meteor.users.find({ joinedSessions: session.slug }).fetch(),
+    users: users || Meteor.users.find({ joinedSessions: session.slug }).fetch(),
     instances
   };
-}, DashboardComp);
+})(DashboardComp);
 
-const DashboardNav = ({ activityId, setActivity, openActivities, session }) => {
-  const relevantActivities = openActivities.filter(
-    x =>
-      activityTypesObj[x.activityType].dashboard &&
-      activityTypesObj[x.activityType].dashboard.Viewer
-  );
+const DashboardNav = props => {
+  const { activityId, setActivity, session, activities } = props;
+  const acWithDash = activities.filter(ac => {
+    const dash = activityTypesObj[ac.activityType].dashboard;
+    return dash && dash.Viewer;
+  });
+  const openAcWithDashIds = acWithDash
+    .filter(
+      x => session.openActivities && session.openActivities.includes(x._id)
+    )
+    .map(x => x._id);
   const aId =
-    activityId || (relevantActivities.length > 0 && relevantActivities[0]._id);
-  if (!aId) {
-    return null;
-  }
+    activityId || (openAcWithDashIds.length > 0 && openAcWithDashIds[0]);
+  const activityToDash = activities.find(a => a._id === aId);
   return (
     <div>
       <h1>Dashboards</h1>
@@ -130,26 +147,23 @@ const DashboardNav = ({ activityId, setActivity, openActivities, session }) => {
           onSelect={a => setActivity(a)}
           style={{ width: '150px' }}
         >
-          {relevantActivities.map(a => (
+          {acWithDash.map(a => (
             <NavItem eventKey={a._id} key={a._id} href="#">
               {a.title}
+              {session.openActivities.includes(a._id) ? ' (open)' : ''}
             </NavItem>
           ))}
         </Nav>
-        {aId && (
-          <Dashboard
-            session={session}
-            activity={openActivities.find(a => a._id === aId)}
-          />
+        {activityToDash && (
+          <ErrorBoundary msg="Dashboard crashed, try reloading">
+            <Dashboard session={session} activity={activityToDash} />
+          </ErrorBoundary>
         )}
       </Container>
     </div>
   );
 };
 
-export default createContainer(
-  ({ openActivities }) => ({
-    openActivities: Activities.find({ _id: { $in: openActivities } }).fetch()
-  }),
-  withState('activityId', 'setActivity', null)(DashboardNav)
-);
+export default withTracker(({ session }) => ({
+  activities: Activities.find({ graphId: session.graphId }).fetch()
+}))(withState('activityId', 'setActivity', null)(DashboardNav));

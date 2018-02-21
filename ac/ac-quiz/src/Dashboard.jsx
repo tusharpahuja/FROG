@@ -1,42 +1,63 @@
 // @flow
 /* eslint-disable react/no-array-index-key */
 
-import React from 'react';
-import { CountChart, ScatterChart, type LogDBT } from 'frog-utils';
+import * as React from 'react';
+import { Button } from 'react-bootstrap';
+import { withState } from 'recompose';
 
-const Viewer = ({ data, config, instances }: Object) => {
+import {
+  CountChart,
+  ScatterChart,
+  ProgressDashboard,
+  LeaderBoard,
+  type LogDBT,
+  type ActivityDbT,
+  type dashboardViewerPropsT
+} from 'frog-utils';
+
+const ScatterViewer = (props: dashboardViewerPropsT) => {
+  const { data: { answers }, config, instances } = props;
+  const questions = config.questions.filter(q => q.question && q.answers);
+  const scatterData =
+    config.argueWeighting &&
+    instances.map(instance => {
+      const coordinates = [0, 0];
+      questions.forEach((q, qIndex) => {
+        if (
+          answers[instance] &&
+          answers[instance][qIndex] &&
+          q.answers[answers[instance][qIndex] - 1]
+        ) {
+          const answerIndex = answers[instance][qIndex] - 1;
+          coordinates[0] += q.answers[answerIndex].x;
+          coordinates[1] += q.answers[answerIndex].y;
+        }
+      });
+      return coordinates;
+    });
+  if (scatterData) {
+    return <ScatterChart data={scatterData} />;
+  } else {
+    return <p>No data</p>;
+  }
+};
+
+const AnswerCountViewer = (props: dashboardViewerPropsT) => {
+  const { data: { answers }, config } = props;
   if (!config) {
     return null;
   }
+
   const questions = config.questions.filter(q => q.question && q.answers);
-  const scatterData =
-    (config.argueWeighting &&
-      (instances || ['1', '2', '3', '4']).map(instance => {
-        const coordinates = [0, 0];
-        questions.forEach((q, qIndex) => {
-          if (
-            data[instance] &&
-            data[instance][qIndex] &&
-            q.answers[data[instance][qIndex] - 1]
-          ) {
-            const answerIndex = data[instance][qIndex] - 1;
-            coordinates[0] += q.answers[answerIndex].x;
-            coordinates[1] += q.answers[answerIndex].y;
-          }
-        });
-        return coordinates;
-      })) ||
-    [];
 
   const answerCounts = questions.map((q, qIndex) =>
-    ((data && Object.values(data)) || []).reduce((acc, val) => {
+    ((answers && Object.values(answers)) || []).reduce((acc, val) => {
       acc[val[qIndex]] += 1;
       return acc;
     }, q.answers.map(() => 0))
   );
   return (
-    <div>
-      {config.argueWeighting && <ScatterChart data={scatterData} />}
+    <React.Fragment>
       {questions.map((q, qIndex) => (
         <CountChart
           key={qIndex}
@@ -47,21 +68,57 @@ const Viewer = ({ data, config, instances }: Object) => {
           data={answerCounts[qIndex]}
         />
       ))}
-    </div>
+    </React.Fragment>
   );
 };
 
-const mergeLog = (data: any, dataFn: Object, log: LogDBT) => {
+const Select = ({ target, onClick }) => (
+  <Button onClick={() => onClick(target)}>{target}</Button>
+);
+
+const Viewer = withState('which', 'setWhich', null)(
+  (props: dashboardViewerPropsT) => {
+    const { which, setWhich } = props;
+    return (
+      <div>
+        <Select target="progress" onClick={setWhich} />
+        <Select target="scatter" onClick={setWhich} />
+        <Select target="count" onClick={setWhich} />
+        <Select target="leaderboard" onClick={setWhich} />
+        {which === 'progress' && <ProgressDashboard.Viewer {...props} />}
+        {which === 'scatter' && <ScatterViewer {...props} />}
+        {which === 'count' && <AnswerCountViewer {...props} />}
+        {which === 'leaderboard' && <LeaderBoard.Viewer {...props} />}
+      </div>
+    );
+  }
+);
+
+const mergeLog = (
+  data: any,
+  dataFn: Object,
+  log: LogDBT,
+  activity: ActivityDbT
+) => {
   if (log.itemId !== undefined && log.type === 'choice') {
-    if (!data[log.instanceId]) {
-      dataFn.objInsert({ [log.itemId]: log.value }, [log.instanceId]);
+    if (!data['answers'][log.instanceId]) {
+      dataFn.objInsert({ [log.itemId]: log.value }, [
+        'answers',
+        log.instanceId
+      ]);
     } else {
-      dataFn.objInsert(log.value, [log.instanceId, log.itemId]);
+      dataFn.objInsert(log.value, ['answers', log.instanceId, log.itemId]);
     }
   }
+  ProgressDashboard.mergeLog(data, dataFn, log, activity);
+  LeaderBoard.mergeLog(data, dataFn, log, activity);
 };
 
-const initData = {};
+const initData = {
+  answers: {},
+  ...ProgressDashboard.initData,
+  ...LeaderBoard.initData
+};
 
 export default {
   Viewer,

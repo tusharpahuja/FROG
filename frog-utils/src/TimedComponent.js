@@ -4,31 +4,52 @@
 // updated every x milliseconds (default 3000)
 // for example export default TimedComponent(Clock)
 
-import React, { Component } from 'react';
+import * as React from 'react';
 
-class TimedComponentClass extends Component {
-  state: {
-    timeNow: any
-  };
+type PropsT = {
+  component: Class<React.Component<*, *>>,
+  interval: number,
+  props: Object
+};
 
+type StateT = {
+  timeNow: number,
+  props: Object
+};
+
+class TimedComponentClass extends React.Component<PropsT, StateT> {
   constructor(props: Object) {
     super(props);
     this.state = {
-      timeNow: Date.now()
+      timeNow: new Date(),
+      props: props.props
     };
   }
 
   _mounted: boolean;
   interval: number;
 
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.timeNow !== this.state.timeNow) {
+      return true;
+    }
+    return !(
+      this.props.props.activity &&
+      nextProps.props.activity &&
+      this.props.props.activity._id === nextProps.props.activity._id
+    );
+  }
+
   componentDidMount() {
     this._mounted = true;
 
-    this.interval = setInterval(() => {
-      if (this._mounted) {
-        this.setState({ timeNow: Date.now() });
-      }
-    }, this.props.interval || 3000);
+    this.interval = Number(
+      setInterval(() => {
+        if (this._mounted) {
+          this.setState({ timeNow: new Date(), props: this.props.props });
+        }
+      }, this.props.interval || 3000)
+    );
   }
 
   componentWillUnmount() {
@@ -37,16 +58,14 @@ class TimedComponentClass extends Component {
   }
 
   render() {
-    return (
-      <this.props.component
-        timeNow={this.state.timeNow}
-        {...this.props.props}
-      />
-    );
+    const Component = this.props.component;
+    return <Component {...this.state.props} timeNow={this.state.timeNow} />;
   }
 }
 
-export default (component: any, interval: number) => (props: Object) => (
+export default (component: Class<React.Component<*>>, interval: number) => (
+  props: Object
+) => (
   <TimedComponentClass
     component={component}
     interval={interval}

@@ -1,7 +1,7 @@
 // @flow
-import React from 'react';
+import * as React from 'react';
 import { Inspector } from 'react-inspector';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import { A } from 'frog-utils';
 import Modal from 'react-modal';
 
@@ -10,8 +10,6 @@ import { Objects } from '../../api/objects';
 import { Activities, Operators } from '../../api/activities';
 import { Products } from '../../api/products';
 import { downloadExport } from './exportComponent';
-
-Modal.setAppElement('#render-target');
 
 const InfoComponent = ({ showInfo, cancelInfo, item, object, product }) => {
   if (!showInfo) {
@@ -56,7 +54,7 @@ const InfoComponent = ({ showInfo, cancelInfo, item, object, product }) => {
   );
 };
 
-const ShowInfoConnect = createContainer(({ showInfo, cancelInfo }) => {
+const ShowInfoConnect = withTracker(({ showInfo, cancelInfo }) => {
   if (!showInfo) {
     return { showInfo: null };
   }
@@ -71,7 +69,7 @@ const ShowInfoConnect = createContainer(({ showInfo, cancelInfo }) => {
     showInfo,
     cancelInfo
   };
-}, InfoComponent);
+})(InfoComponent);
 ShowInfoConnect.displayName = 'ShowInfoConnect';
 
 const ShowInfo = connect(({ store: { ui: { showInfo, cancelInfo } } }) => (
