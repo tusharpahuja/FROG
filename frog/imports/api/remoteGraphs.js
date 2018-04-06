@@ -1,5 +1,5 @@
 import { uuid } from 'frog-utils';
-import { Graphs } from '/imports/api/graphs';
+import { Graphs, renameGraph } from '/imports/api/graphs';
 import { graphToString, doImportGraph } from '../ui/GraphEditor/utils/export';
 
 export const removeGraph = (id: string) =>
@@ -39,5 +39,6 @@ export const importGraph = (id: string) => {
     .then(e => {
       const graphId = doImportGraph(e.find(x => x.uuid === id).graph);
       Graphs.update({ _id: graphId }, { $set: { parentId: id } });
+      renameGraph(graphId, e.find(x => x.uuid === id).title)
     });
 };

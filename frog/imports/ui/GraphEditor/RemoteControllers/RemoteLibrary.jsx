@@ -42,7 +42,6 @@ class Library extends Component<Object> {
       store,
       importList
     } = this.props;
-
     return (
       <div
         className="list-group"
@@ -72,9 +71,12 @@ class Library extends Component<Object> {
                     x.activity_type,
                     x.config,
                     activityId,
+                    null,
                     x.parent_id,
-                    x.uuid
                   );
+                  store.activityStore.all.find(
+                    act => act.id === activityId
+                  ).rename(x.title)
                   store.addHistory();
                 } else if (libraryType === 'graph') {
                   importGraph(x.uuid);
