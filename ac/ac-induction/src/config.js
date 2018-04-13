@@ -3,38 +3,15 @@
 export default {
   type: 'object',
   properties: {
-    title: {
-      type: 'string',
-      title: 'Title'
-    },
-    partStr: {
-      type: 'string',
-      title: "List parts followed by nb (ex: 'f3,d,e4,t10,f5')"
-    },
-    definition: {
-      type: 'string',
-      title: 'Definition of the concept: '
+    categories: {
+      title: 'List of categories',
+      type: 'array',
+      items: { type: 'string' }
     },
     properties: {
-      title:
-        'Put all properties that you will need (watch for the index, start at 0)',
+      title: 'List of properties',
       type: 'array',
-      items: {
-        type: 'string'
-      }
-    },
-    suffisantSets: {
-      title:
-        "Put all minimum suffisant sets of properties as '{a,b},{a,c},…' (where a,b,c are the index of the above properties)",
-      type: 'string'
-    }, // minimum => a set should not contain another outline
-    contradictoryProperties: {
-      title: "Put all properties that contradict the concept as 'a,b,c'",
-      type: 'string'
-    },
-    unnecessaryProperties: {
-      title: "Put all properties that aren't related to the concept as 'a,b,c'",
-      type: 'string'
+      items: { type: 'string' }
     },
     examples: {
       title: 'New example',
@@ -43,16 +20,15 @@ export default {
         type: 'object',
         properties: {
           url: {
-            title: 'image URL',
+            title: 'Image URL',
             type: 'string'
           },
-          isIncorrect: {
-            title: "This example isn't correct",
-            type: 'boolean'
+          category: {
+            title: "Category",
+            type: 'string'
           },
-          respectedProperties: {
-            title:
-              "Put all properties that are true for this example as 'a,b,c'",
+          properties: {
+            title: "Indices of true properties",
             type: 'string'
           }
         }
