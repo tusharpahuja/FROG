@@ -67,6 +67,21 @@ const Runner = ({ path, activity, sessionId, object, single }) => {
     activity.participationMode === 'readonly' &&
     Meteor.user().username !== 'teacher';
 
+  const optimizer = {
+    recommend: () => {
+      Meteor.call('optim.recommend', (err, result) => {
+        console.log(err)
+        console.log(result)
+      })
+    },
+    report: () => {
+      Meteor.call('optim.report', (err, result) => {
+        console.log(err)
+        console.log(result)
+      })
+    }
+  }
+
   const Torun = (
     <RunActivity
       activityTypeId={activity.activityType}
@@ -79,6 +94,7 @@ const Runner = ({ path, activity, sessionId, object, single }) => {
       groupingValue={groupingValue}
       sessionId={sessionId}
       readOnly={readOnly}
+      optimizer={optimizer}
     />
   );
 
