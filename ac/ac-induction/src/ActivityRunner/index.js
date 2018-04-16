@@ -8,6 +8,36 @@ import { withStyles } from 'material-ui/styles';
 import Example from '../Components/Example';
 import Test from '../Components/Test';
 
+
+const test = () => {
+  console.log('Request')
+  const http = new XMLHttpRequest();
+  const url = "http://localhost:8000";
+  const params = '{ "requestType": "INIT", "sessionId": "A" }';
+  http.open("POST", url, true);
+
+
+  // var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
+  // xmlhttp.open("POST", "localhost:8000", true);
+  // xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  // xmlhttp.send(JSON.stringify({ email: "hello@user.com", response: { name: "Tester" } }));
+
+
+  // Send the proper header information along with the request
+  http.setRequestHeader("Content-type", "application/json");
+
+  http.onreadystatechange = function() {
+      console.log('http')
+      console.log(http)
+      if(http.readyState == 4 && http.status == 200) {
+          alert(http.responseText);
+      }
+  }
+  console.log('Sending')
+  http.send(params);
+}
+
+
 const styles = () => ({
   container: {
     width: '100%',
@@ -28,13 +58,15 @@ const ActivityRunner = (props: ActivityRunnerT & {classes: Object}) => {
   }
 
   const Comp = { example: Example, test: Test }[type]
-
+  //       <Comp example={examples[ex]} next={next} categories={categories} withFeedback />
   return (
     <div className={classes.container}>
-      <Comp example={examples[ex]} next={next} categories={categories} withFeedback />
+      <button onClick={test} style={{width:"200px", height:"200px"}}/>
     </div>
   );
 };
+
+
 
 const AR = compose(
   withState('ex', 'setEx', 0),

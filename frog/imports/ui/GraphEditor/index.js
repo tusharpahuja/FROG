@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+
+import { Meteor } from 'meteor/meteor'
+
 // @flow
 import { Provider } from 'mobx-react';
 import Mousetrap from 'mousetrap';
@@ -61,6 +64,11 @@ GraphEditor.displayName = 'GraphEditor';
 
 export default GraphEditor;
 
+const test = () => {
+  console.log('test')
+  Meteor.call('optim', (error, result) => console.log(error,result))
+}
+
 const bindKeys = () => {
   Mousetrap.bind('esc', () => {
     if (!store.ui.sidepanelOpen) {
@@ -70,6 +78,7 @@ const bindKeys = () => {
   });
   Mousetrap.bind('backspace', store.deleteSelected);
   Mousetrap.bind('?', () => store.ui.setModal(true));
+  Mousetrap.bind('t', test);
   Mousetrap.bind('s', () => store.operatorStore.place('social'));
   Mousetrap.bind('+', () => store.activityStore.duplicateActivity());
   Mousetrap.bind('c', () => store.operatorStore.place('control'));
