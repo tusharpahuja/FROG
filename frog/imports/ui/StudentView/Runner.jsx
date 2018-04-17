@@ -21,6 +21,15 @@ const getStructure = activity => {
   }
 };
 
+const optimizer = {
+  recommend: (context, callback) => {
+    Meteor.call('optim.recommend', context, callback)
+  },
+  report: (context, item, score, callback) => {
+    Meteor.call('optim.report', context, item, score, callback)
+  }
+}
+
 const Runner = ({ path, activity, sessionId, object, single }) => {
   if (!activity) {
     return <p>NULL ACTIVITY</p>;
@@ -67,21 +76,6 @@ const Runner = ({ path, activity, sessionId, object, single }) => {
     activity.participationMode === 'readonly' &&
     Meteor.user().username !== 'teacher';
 
-  const optimizer = {
-    recommend: () => {
-      Meteor.call('optim.recommend', (err, result) => {
-        console.log(err)
-        console.log(result)
-      })
-    },
-    report: () => {
-      Meteor.call('optim.report', (err, result) => {
-        console.log(err)
-        console.log(result)
-      })
-    }
-  }
-
   const Torun = (
     <RunActivity
       activityTypeId={activity.activityType}
@@ -94,7 +88,6 @@ const Runner = ({ path, activity, sessionId, object, single }) => {
       groupingValue={groupingValue}
       sessionId={sessionId}
       readOnly={readOnly}
-      optimizer={optimizer}
     />
   );
 
@@ -168,6 +161,7 @@ export class RunActivity extends React.Component<PropsT, {}> {
         stream={this.props.stream}
         groupingValue={this.props.groupingValue}
         sessionId={this.props.sessionId}
+        optimizer={optimizer}
       />
     );
   }
