@@ -21,11 +21,13 @@ const styles = () => ({
   }
 });
 
-const Feedback = ({ selected, next, classes }) => (
+const Feedback = ({ correct, expected, next, classes }) => (
   <React.Fragment>
     <CardContent>
-      <Typography paragraph variant="body2">
-        {'You have selected: ' + JSON.stringify(selected, null, 2)}
+      <Typography paragraph variant="body1">
+        {correct
+          ? 'Bravo, you are right!'
+          : 'The correct answer was ' + expected}
       </Typography>
     </CardContent>
     <CardActions>
@@ -52,7 +54,12 @@ const StatelessTest = props => {
     setFeedback
   } = props;
   const onClick = category => {
-    setFeedback({ selected: category });
+    setFeedback({
+      selected: category,
+      expected: example.category,
+      correct: category === example.category
+    });
+
     if (!withFeedback) {
       next();
     }
@@ -76,6 +83,8 @@ const StatelessTest = props => {
             color="primary"
             onClick={() => onClick(category)}
             className={classes.button}
+            variant={feedback && feedback.selected === category? 'raised': 'flat'}
+            disabled={!!feedback}
           >
             {category}
           </Button>
@@ -85,8 +94,10 @@ const StatelessTest = props => {
           color="primary"
           onClick={() => onClick('idk')}
           className={classes.button}
+          variant={feedback && feedback.selected === 'idk' ? 'raised': 'flat'}
+          disabled={!!feedback}
         >
-          Je ne sais pas
+          I don't know
         </Button>
       </CardActions>
       <Collapse in={!!feedback} timeout="auto" unmountOnExit>

@@ -15,7 +15,8 @@ const styles = () => ({
     height: '100%',
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    flexDirection: 'column'
   }
 });
 
@@ -24,17 +25,28 @@ const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
   const { examples, categories } = activityData.config;
   const { recommend, report } = props.optimizer;
 
+  const next = () => {
+    setExample({ spinning: true });
+    recommend(0, (err, res) => {
+      if (err) {
+        console.log('----------ERROR----------');
+        console.log(err);
+      } else if (res) {
+        console.log(res);
+        const reco = res.data.msg;
+        const newExample = shuffle(examples).find(ex => ex.category === reco);
+        setExample(newExample);
+        setType(type === 'example' ? 'test' : 'example');
+      }
+    });
+  };
+
   if (example === null) {
     return (
       <div className={classes.container}>
-        <button
-          onClick={() => {
-            setExample(examples[0]);
-          }}
-          style={{ width: '100px', height: '100px' }}
-        >
-          {' '}
-          START{' '}
+        <p>Placeholder for consent form</p>
+        <button onClick={next}>
+          I want to participate
         </button>
       </div>
     );
@@ -48,35 +60,18 @@ const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
     );
   }
 
-  const next = () => {
-    setExample({ spinning: true });
-    recommend(0, (err, res) => {
-      if (err) {
-        console.log('----------ERROR----------');
-        console.log(err);
-      } else if (res) {
-        console.log(res);
-        const categoryReco = res;
-        const newExample = { spinning: true };
-        setExample(examples);
-        setType(type === 'example' ? 'test' : 'example');
-      }
-    });
-  };
+
 
   const Comp = { example: Example, test: Test }[type];
 
   return (
     <div className={classes.container}>
-      {example.spinning && <h1>WAIT</h1>}
-      {!example.spinning && (
-        <Comp
-          example={example}
-          next={next}
-          categories={categories}
-          withFeedback
-        />
-      )}
+      <Comp
+        example={example}
+        next={next}
+        categories={categories}
+        withFeedback
+      />
     </div>
   );
 };

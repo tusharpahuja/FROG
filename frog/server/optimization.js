@@ -3,7 +3,7 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 
-const url = 'http://localhost:8000';
+const url = 'http://128.179.161.71:8000';
 
 Meteor.methods({
   'optim.recommend': context => {
