@@ -24,11 +24,11 @@ export default {
             type: 'string'
           },
           category: {
-            title: "Category",
+            title: 'Category',
             type: 'string'
           },
           properties: {
-            title: "Indices of true properties",
+            title: 'Indices of true properties',
             type: 'string'
           }
         }

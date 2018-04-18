@@ -9,23 +9,19 @@ import Typography from 'material-ui/Typography';
 
 const styles = () => ({
   card: {
-    width: 400,
+    width: 400
   },
   media: {
-    height: 400,
+    height: 400
   },
   next: {
     marginLeft: 'auto'
   }
-})
+});
 
-const Example = ({ example, next, classes }) =>
+const Example = ({ example, next, classes }) => (
   <Card className={classes.card}>
-    <CardMedia
-      className={classes.media}
-      image={example.url}
-      title="Example"
-    />
+    <CardMedia className={classes.media} image={example.url} title="Example" />
     <CardContent>
       <Typography gutterBottom variant="headline" component="h2">
         {example.category}
@@ -37,5 +33,6 @@ const Example = ({ example, next, classes }) =>
       </Button>
     </CardActions>
   </Card>
+);
 
-export default withStyles(styles)(Example)
+export default withStyles(styles)(Example);

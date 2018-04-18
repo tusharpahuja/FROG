@@ -2,8 +2,9 @@
 
 import * as React from 'react';
 import type { ActivityRunnerT } from 'frog-utils';
-import { compose, withState } from 'recompose'
+import { compose, withState } from 'recompose';
 import { withStyles } from 'material-ui/styles';
+import { shuffle } from 'lodash';
 
 import Example from '../Components/Example';
 import Test from '../Components/Test';
@@ -16,35 +17,73 @@ const styles = () => ({
     alignItems: 'center',
     justifyContent: 'center'
   }
-})
+});
 
-const ActivityRunner = (props: ActivityRunnerT & {classes: Object}) => {
-  const { activityData, classes, ex, setEx, type, setType } = props
+const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
+  const { activityData, classes, example, setExample, type, setType } = props;
   const { examples, categories } = activityData.config;
-  const { recommend, report } = props.optimizer
+  const { recommend, report } = props.optimizer;
 
-  const next = () => {
-    setEx((ex + 1)% examples.length)
-    setType(type === 'example' ? 'test' : 'example')
+  if (example === null) {
+    return (
+      <div className={classes.container}>
+        <button
+          onClick={() => {
+            setExample(examples[0]);
+          }}
+          style={{ width: '100px', height: '100px' }}
+        >
+          {' '}
+          START{' '}
+        </button>
+      </div>
+    );
   }
 
-  const Comp = { example: Example, test: Test }[type]
-  //       <Comp example={examples[ex]} next={next} categories={categories} withFeedback />
+  if (example.spinning) {
+    return (
+      <div className={classes.container}>
+        <h1>PLEASE WAIT</h1>
+      </div>
+    );
+  }
+
+  const next = () => {
+    setExample({ spinning: true });
+    recommend(0, (err, res) => {
+      if (err) {
+        console.log('----------ERROR----------');
+        console.log(err);
+      } else if (res) {
+        console.log(res);
+        const categoryReco = res;
+        const newExample = { spinning: true };
+        setExample(examples);
+        setType(type === 'example' ? 'test' : 'example');
+      }
+    });
+  };
+
+  const Comp = { example: Example, test: Test }[type];
+
   return (
     <div className={classes.container}>
-      <button onClick={() => recommend([0,0.1,0.2], (err, res) => {
-        console.log(err)
-        console.log(res)
-      })} style={{width:"200px", height:"200px"}}/>
+      {example.spinning && <h1>WAIT</h1>}
+      {!example.spinning && (
+        <Comp
+          example={example}
+          next={next}
+          categories={categories}
+          withFeedback
+        />
+      )}
     </div>
   );
 };
 
-
-
 const AR = compose(
-  withState('ex', 'setEx', 0),
+  withState('example', 'setExample', null),
   withState('type', 'setType', 'example')
-)(ActivityRunner)
+)(ActivityRunner);
 
-export default withStyles(styles)(AR)
+export default withStyles(styles)(AR);

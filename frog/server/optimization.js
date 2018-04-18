@@ -1,39 +1,39 @@
 // @flow
 
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http'
+import { HTTP } from 'meteor/http';
 
-const url = 'http://128.179.165.91:8000'
+const url = 'http://localhost:8000';
 
 Meteor.methods({
-  'optim.recommend': (context) => {
-    if(Meteor.isServer) {
-      console.log('Recommend')
+  'optim.recommend': context => {
+    if (Meteor.isServer) {
+      console.log('Recommend');
       const result = HTTP.post(url, {
         data: {
-          sessionId: 'json',
+          sessionId: 'EXPERIMENT_0',
           requestType: 'RECO',
           context
         }
-      })
-      console.log(result)
-      return result
+      });
+      console.log(result);
+      return result;
     }
   },
   'optim.report': (context, item, score) => {
-    if(Meteor.isServer) {
-      console.log('Report')
+    if (Meteor.isServer) {
+      console.log('Report');
       const result = HTTP.post(url, {
         data: {
-          sessionId: 'json',
+          sessionId: 'EXPERIMENT_0',
           requestType: 'SCOR',
           context,
           item,
           score
         }
-      })
-      console.log(result)
-      return result
+      });
+      console.log(result);
+      return result;
     }
   }
 });

@@ -1,7 +1,7 @@
 // @flow
 
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http'
+import { HTTP } from 'meteor/http';
 import { Accounts } from 'meteor/accounts-base';
 
 import { Activities } from './activities';
@@ -74,10 +74,10 @@ export const runSessionFn = (sessionId: string) => {
 };
 
 const test = () => {
-  if(Meteor.isServer) {
-    console.log('Request')
+  if (Meteor.isServer) {
+    console.log('Request');
     // const http = new XMLHttpRequest();
-    const url = "http://localhost:8000";
+    const url = 'http://localhost:8000';
     // const params = '{ "requestType": "INIT", "sessionId": "A" }';
     // http.open("POST", url, true);
     //
@@ -100,16 +100,16 @@ const test = () => {
     // }
     // console.log('Sending')
     // http.send(params);
-    const result = HTTP.post( url, {
+    const result = HTTP.post(url, {
       data: { sessionId: 'json', requestType: 'RECO' }
-    })
-    console.log(result)
-    return result
+    });
+    console.log(result);
+    return result;
   }
-}
+};
 
 Meteor.methods({
   'run.session': runSessionFn,
   'next.activity': runNextActivity,
-  'optim': test
+  optim: test
 });
