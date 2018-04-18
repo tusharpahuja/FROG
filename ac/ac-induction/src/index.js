@@ -76,5 +76,6 @@ export default ({
   config,
   meta,
   ActivityRunner,
+  dataStructure: { progress: 0 },
   dashboard
 }: ActivityPackageT);

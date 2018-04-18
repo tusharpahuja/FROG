@@ -8,11 +8,6 @@ export default {
       type: 'array',
       items: { type: 'string' }
     },
-    properties: {
-      title: 'List of properties',
-      type: 'array',
-      items: { type: 'string' }
-    },
     examples: {
       title: 'New example',
       type: 'array',
@@ -20,15 +15,11 @@ export default {
         type: 'object',
         properties: {
           url: {
-            title: 'Image URL',
+            title: 'url',
             type: 'string'
           },
           category: {
-            title: 'Category',
-            type: 'string'
-          },
-          properties: {
-            title: 'Indices of true properties',
+            title: 'category',
             type: 'string'
           }
         }

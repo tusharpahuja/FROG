@@ -53,12 +53,12 @@ const StatelessTest = props => {
     feedback,
     setFeedback
   } = props;
+  const { report } = props.optimizer
   const onClick = category => {
-    setFeedback({
-      selected: category,
-      expected: example.category,
-      correct: category === example.category
-    });
+    const correct = category === example.category ? 1: 0
+    const expected = example.category
+    report(0, expected, correct)
+    setFeedback({ selected: category, expected, correct });
 
     if (!withFeedback) {
       next();

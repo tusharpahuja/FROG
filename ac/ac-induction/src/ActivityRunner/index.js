@@ -21,11 +21,15 @@ const styles = () => ({
 });
 
 const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
-  const { activityData, classes, example, setExample, type, setType } = props;
+  const { activityData, classes, example, setExample, type, setType, dataFn } = props;
   const { examples, categories } = activityData.config;
-  const { recommend, report } = props.optimizer;
 
-  const next = () => {
+  const tests = examples
+
+  const { progress } = props.data || 0
+  const { recommend } = props.optimizer;
+
+  const nextExample = () => {
     setExample({ spinning: true });
     recommend(0, (err, res) => {
       if (err) {
@@ -36,16 +40,22 @@ const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
         const reco = res.data.msg;
         const newExample = shuffle(examples).find(ex => ex.category === reco);
         setExample(newExample);
-        setType(type === 'example' ? 'test' : 'example');
+        setType('example');
       }
     });
   };
+
+  const nextTest = () => {
+    dataFn.numIncr(1, 'progress')
+    setExample(tests[progress % tests.length])
+    setType('test');
+  }
 
   if (example === null) {
     return (
       <div className={classes.container}>
         <p>Placeholder for consent form</p>
-        <button onClick={next}>
+        <button onClick={nextExample}>
           I want to participate
         </button>
       </div>
@@ -60,9 +70,8 @@ const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
     );
   }
 
-
-
   const Comp = { example: Example, test: Test }[type];
+  const next = { example: nextTest, test: nextExample }[type]
 
   return (
     <div className={classes.container}>
@@ -71,6 +80,7 @@ const ActivityRunner = (props: ActivityRunnerT & { classes: Object }) => {
         next={next}
         categories={categories}
         withFeedback
+        optimizer={props.optimizer}
       />
     </div>
   );
