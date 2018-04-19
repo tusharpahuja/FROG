@@ -41,9 +41,10 @@ export const runNextActivity = (sessionId: string) => {
     const justClosedActivities = oldOpen.filter(
       act => !openActivities.includes(act)
     );
-    justClosedActivities.forEach(act =>
-      Meteor.call('reactive.to.product', act)
-    );
+    justClosedActivities.forEach(act => {
+      Meteor.call('reactive.to.product', act);
+      Meteor.call('archive.dashboard.state', act);
+    });
   }
 };
 

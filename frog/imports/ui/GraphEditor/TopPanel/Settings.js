@@ -8,15 +8,15 @@ import Paper from 'material-ui/Paper';
 import { withStyles } from 'material-ui/styles';
 import { Manager, Target, Popper } from 'react-popper';
 import ClickAwayListener from 'material-ui/utils/ClickAwayListener';
-import Undo from 'material-ui-icons/Undo';
-import Check from 'material-ui-icons/Check';
-import Add from 'material-ui-icons/Add';
-import ContentCopy from 'material-ui-icons/ContentCopy';
-import Delete from 'material-ui-icons/Delete';
-import ImportExport from 'material-ui-icons/ImportExport';
-import Image from 'material-ui-icons/Image';
-import MoreVertIcon from 'material-ui-icons/MoreVert';
-import Timeline from 'material-ui-icons/Timeline';
+import Undo from '@material-ui/icons/Undo';
+import Check from '@material-ui/icons/Check';
+import Add from '@material-ui/icons/Add';
+import ContentCopy from '@material-ui/icons/ContentCopy';
+import Delete from '@material-ui/icons/Delete';
+import ImportExport from '@material-ui/icons/ImportExport';
+import Image from '@material-ui/icons/Image';
+import MoreVertIcon from '@material-ui/icons/MoreVert';
+import Timeline from '@material-ui/icons/Timeline';
 import Tooltip from 'material-ui/Tooltip';
 
 import { exportGraph, importGraph, duplicateGraph } from '../utils/export';
@@ -99,7 +99,8 @@ class GraphActionMenu extends React.Component {
       classes,
       overlapAllowed,
       graphId,
-      toggleOverlapAllowed
+      toggleOverlapAllowed,
+      setSidepanelOpen
     } = this.props;
     const { open } = this.state;
 
@@ -205,6 +206,29 @@ class GraphActionMenu extends React.Component {
                       <Image className={classes.leftIcon} aria-hidden="true" />Export
                       Graph as Image
                     </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        setSidepanelOpen(false);
+                        this.props.openImport();
+                        this.handleClose();
+                      }}
+                    >
+                      <ImportExport
+                        className={classes.leftIcon}
+                        aria-hidden="true"
+                      />Import Graph from the Server
+                    </MenuItem>
+                    <MenuItem
+                      onClick={() => {
+                        this.props.openExport();
+                        this.handleClose();
+                      }}
+                    >
+                      <Timeline
+                        className={classes.leftIcon}
+                        aria-hidden="true"
+                      />Export Graph to the Server
+                    </MenuItem>
                   </MenuList>
                 </Paper>
               </Grow>
@@ -217,11 +241,25 @@ class GraphActionMenu extends React.Component {
 }
 
 export const ConfigMenu = connect(
-  ({ store: { overlapAllowed, graphId, toggleOverlapAllowed } }) => (
+  ({
+    store: {
+      overlapAllowed,
+      graphId,
+      toggleOverlapAllowed,
+      ui: { setSidepanelOpen }
+    },
+    openExport,
+    openImport
+  }) => (
     <GraphActionMenu
-      overlapAllowed={overlapAllowed}
-      graphId={graphId}
-      toggleOverlapAllowed={toggleOverlapAllowed}
+      {...{
+        overlapAllowed,
+        graphId,
+        toggleOverlapAllowed,
+        setSidepanelOpen,
+        openExport,
+        openImport
+      }}
     />
   )
 );
