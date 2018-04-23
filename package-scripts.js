@@ -48,6 +48,7 @@ module.exports = {
       'flow --quiet && npm run -s start eslint-test && npm run -s start jest'
     ),
     watch: fromRoot(`node watch.js ${process.env['PWD']}`),
+    buildAndWatch: fromRoot(`node watch.js ${process.env['PWD']} build`),
     watchAll: fromRoot('node watch.js all'),
     buildAndWatchAll: fromRoot('node watch.js all build'),
     buildAll: buildAll(false),

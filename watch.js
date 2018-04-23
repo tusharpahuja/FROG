@@ -11,7 +11,9 @@ const pattern =
     ? ['ac/*/src/**', 'op/*/src/**', 'frog-utils/src/**']
     : `${process.argv[2]}/src`;
 
-const build = process.argv[3] === 'build';
+console.log(pattern);
+
+let build = process.argv[3] === 'build';
 
 const dist = path => path.replace('/src/', '/dist/').replace('.jsx', '.js');
 
@@ -60,6 +62,7 @@ const watcher = chokidar
     ignoreInitial: !build
   })
   .on('add', src => {
+    console.log(src);
     if (build) rm('file', src);
 
     transpile('add', src);
@@ -75,6 +78,9 @@ const watcher = chokidar
   })
   .on('unlinkDir', src => {
     rm('directory', src);
+  })
+  .on('ready', () => {
+    if (build) build = false;
   });
 
 const log = console.info.bind(console);
