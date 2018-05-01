@@ -3,7 +3,6 @@
 import { type ActivityPackageT } from 'frog-utils';
 
 import config from './config';
-import dashboard from './Dashboard';
 import ActivityRunner from './ActivityRunner';
 
 const meta = {
@@ -76,6 +75,5 @@ export default ({
   config,
   meta,
   ActivityRunner,
-  dataStructure: { progress: 0 },
-  dashboard
+  dataStructure: { progress: 0 }
 }: ActivityPackageT);
