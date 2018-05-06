@@ -1,8 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import type { ActivityRunnerPropsT } from 'frog-utils';
-import { compose, withState } from 'recompose';
 import { withStyles } from 'material-ui/styles';
 import { shuffle } from 'lodash';
 
@@ -25,98 +23,114 @@ const styles = () => ({
   }
 });
 
-const ActivityRunner = (props: ActivityRunnerPropsT & { classes: Object }) => {
-  const {
-    activityData,
-    classes,
-    example,
-    setExample,
-    type,
-    setType,
-    dataFn,
-    optimState,
-    setOptimState
-  } = props;
-  const { examples, categories } = activityData.config;
+const N_TESTS = 5;
 
-  const tests = examples;
+class ActivityRunner extends React.Component {
+  state = {
+    progress: -1,
+    example: null,
+    context: null
+  };
 
-  const { progress } = props.data || 0;
-  const { recommend } = props.optimizer;
+  constructor(props) {
+    super(props);
+    const { examples } = props.activityData.config;
+    this.tests = examples.slice(0, N_TESTS);
+    this.examples = examples.slice(N_TESTS);
+    this.state.context = examples.map(_ => 0);
+  }
 
-  const nextExample = () => {
-    setExample({ spinning: true });
-    recommend(0, (err, res) => {
+  nextExample = () => {
+    const { optimizer } = this.props;
+    this.setState({ spinning: true });
+    optimizer.recommend(0, (err, res) => {
       if (err) {
         console.log('----------ERROR----------');
         console.log(err);
       } else if (res) {
         console.log(res);
         const reco = res.data.msg;
-        const newExample = shuffle(examples).find(ex => ex.category === reco);
-        setExample(newExample);
-        setType('example');
+        const [newExample, idx] = shuffle(
+          this.examples.map((x, i) => [x, i])
+        ).find(ex => ex[0].category === reco);
+        const newContext = [...this.state.context];
+        newContext[N_TESTS + idx] += 1;
+        this.setState({ context: newContext });
+        this.setState({ example: newExample });
+        this.setState({ type: 'example' });
+        this.setState({ item: reco });
+        this.setState({ spinning: false });
       }
     });
   };
 
-  const nextTest = () => {
-    dataFn.numIncr(1, 'progress');
-    setExample(tests[progress % tests.length]);
-    setType('test');
+  nextTest = () => {
+    const newProgress = this.state.progress + 1;
+    this.setState({ progress: newProgress });
+    this.setState({ example: this.tests[newProgress % N_TESTS] });
+    this.setState({ type: 'test' });
   };
 
-  if (example === null) {
+  reportScore = score => {
+    const { optimizer } = this.props;
+    const { item } = this.state;
+    const newContext = [...this.state.context];
+    newContext[this.state.progress % N_TESTS] = score > 0 ? 1 : -1;
+    this.setState({ context: newContext });
+    optimizer.report(0, item, score);
+  };
+
+  render() {
+    console.log(this.state);
+
+    const { activityData, classes } = this.props;
+    const { categories } = activityData.config;
+
+    const { example, spinning, type } = this.state;
+    if (example === null) {
+      return (
+        <div className={classes.container}>
+          <pre className={classes.optimState}>
+            {JSON.stringify(this.state, null, 2)}
+          </pre>
+          <p>Placeholder for consent form</p>
+          <button onClick={this.nextExample}>I want to participate</button>
+        </div>
+      );
+    }
+
+    if (spinning) {
+      return (
+        <div className={classes.container}>
+          <pre className={classes.optimState}>
+            {JSON.stringify(this.state, null, 2)}
+          </pre>
+          <h1>PLEASE WAIT</h1>
+        </div>
+      );
+    }
+
+    const Comp = { example: Example, test: Test }[type];
+    const next = { example: this.nextTest, test: this.nextExample }[type];
+
     return (
       <div className={classes.container}>
-        <p className={classes.optimState}>
-          {JSON.stringify(optimState, null, 2)}
-        </p>
-        <p>Placeholder for consent form</p>
-        <button onClick={nextExample}>I want to participate</button>
+        <pre className={classes.optimState}>
+          {JSON.stringify(this.state, null, 2)}
+        </pre>
+        <Comp
+          example={example}
+          next={next}
+          categories={categories}
+          withFeedback
+          optimizer={this.props.optimizer}
+          reportScore={this.reportScore}
+        />
       </div>
     );
   }
+}
 
-  if (example.spinning) {
-    return (
-      <div className={classes.container}>
-        <p className={classes.optimState}>
-          {JSON.stringify(optimState, null, 2)}
-        </p>
-        <h1>PLEASE WAIT</h1>
-      </div>
-    );
-  }
-
-  const Comp = { example: Example, test: Test }[type];
-  const next = { example: nextTest, test: nextExample }[type];
-
-  return (
-    <div className={classes.container}>
-      <p className={classes.optimState}>
-        {JSON.stringify(optimState, null, 2)}
-      </p>
-      <Comp
-        example={example}
-        next={next}
-        categories={categories}
-        withFeedback
-        optimizer={props.optimizer}
-      />
-    </div>
-  );
-};
-
-const AR = compose(
-  withStyles(styles),
-  withState('example', 'setExample', null),
-  withState('optimState', 'setOptimState', {
-    context: [0, 0, 0, 0],
-    item: null,
-    result: null
-  }),
-  withState('type', 'setType', 'example')
-)(ActivityRunner);
+const AR = withStyles(styles)(ActivityRunner);
 
 export default AR;

@@ -9,15 +9,19 @@ import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Collapse from 'material-ui/transitions/Collapse';
 
+import red from 'material-ui/colors/red';
+import green from 'material-ui/colors/green';
+
 const styles = () => ({
   card: {
-    width: 400
+    width: 450
   },
   media: {
-    height: 400
+    height: 450
   },
   button: {
-    margin: 'auto'
+    margin: 'auto',
+    width: '30%'
   }
 });
 
@@ -50,20 +54,31 @@ const StatelessTest = props => {
     categories,
     next,
     classes,
+    reportScore,
     feedback,
     setFeedback
   } = props;
-  const { report } = props.optimizer
   const onClick = category => {
-    const correct = category === example.category ? 1: 0
-    const expected = example.category
-    report(0, expected, correct)
+    const correct = category === example.category ? 1 : 0;
+    const expected = example.category;
+    reportScore(correct);
     setFeedback({ selected: category, expected, correct });
 
     if (!withFeedback) {
       next();
     }
   };
+
+  const getButtonStyle = category => {
+    if (!feedback) {
+      return {};
+    } else if (category === example.category) {
+      return { backgroundColor: green[700], color: 'white' };
+    } else if (category === feedback.selected) {
+      return { backgroundColor: red[700], color: 'white' };
+    }
+  };
+
   return (
     <Card className={classes.card}>
       <CardMedia
@@ -81,10 +96,11 @@ const StatelessTest = props => {
           <Button
             key={category}
             color="primary"
+            variant="raised"
             onClick={() => onClick(category)}
             className={classes.button}
-            variant={feedback && feedback.selected === category? 'raised': 'flat'}
             disabled={!!feedback}
+            style={getButtonStyle(category)}
           >
             {category}
           </Button>
@@ -92,9 +108,9 @@ const StatelessTest = props => {
         <Button
           key="idk"
           color="primary"
+          variant="raised"
           onClick={() => onClick('idk')}
           className={classes.button}
-          variant={feedback && feedback.selected === 'idk' ? 'raised': 'flat'}
           disabled={!!feedback}
         >
           I don't know

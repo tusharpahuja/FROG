@@ -3,12 +3,11 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 
-const url = 'http://128.179.164.190:8000';
+const url = 'http://128.179.165.95:8000';
 
 Meteor.methods({
   'optim.recommend': context => {
     if (Meteor.isServer) {
-      console.log('Recommend');
       const result = HTTP.post(url, {
         data: {
           sessionId: 'EXPERIMENT_0',
@@ -16,13 +15,11 @@ Meteor.methods({
           context
         }
       });
-      console.log(result);
       return result;
     }
   },
   'optim.report': (context, item, score) => {
     if (Meteor.isServer) {
-      console.log('Report');
       const result = HTTP.post(url, {
         data: {
           sessionId: 'EXPERIMENT_0',
@@ -32,7 +29,6 @@ Meteor.methods({
           score
         }
       });
-      console.log(result);
       return result;
     }
   }
