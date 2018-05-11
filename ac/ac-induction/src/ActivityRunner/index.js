@@ -25,11 +25,31 @@ const styles = () => ({
 
 const N_TESTS = 5;
 
-class ActivityRunner extends React.Component {
+type StateT = {
+  progress: number,
+  example: ?Object,
+  context: {
+    examples: number[],
+    tests: number[],
+    latest: number[]
+  },
+  type?: string,
+  item?: string,
+  spinning?: boolean
+};
+
+class ActivityRunner extends React.Component<any, StateT> {
+  tests: Object[];
+  examples: Object[];
+
   state = {
     progress: -1,
     example: null,
-    context: null
+    context: {
+      examples: [],
+      tests: [],
+      latest: []
+    }
   };
 
   constructor(props) {
@@ -37,7 +57,11 @@ class ActivityRunner extends React.Component {
     const { examples } = props.activityData.config;
     this.tests = examples.slice(0, N_TESTS);
     this.examples = examples.slice(N_TESTS);
-    this.state.context = examples.map(_ => 0);
+    this.state.context = {
+      examples: this.examples.map(_ => 0),
+      tests: this.tests.map(_ => 0),
+      latest: this.tests.map(_ => 0)
+    };
   }
 
   nextExample = () => {
@@ -45,16 +69,14 @@ class ActivityRunner extends React.Component {
     this.setState({ spinning: true });
     optimizer.recommend(0, (err, res) => {
       if (err) {
-        console.log('----------ERROR----------');
-        console.log(err);
+        console.error(err);
       } else if (res) {
-        console.log(res);
         const reco = res.data.msg;
         const [newExample, idx] = shuffle(
           this.examples.map((x, i) => [x, i])
         ).find(ex => ex[0].category === reco);
-        const newContext = [...this.state.context];
-        newContext[N_TESTS + idx] += 1;
+        const newContext = { ...this.state.context };
+        newContext.examples[idx] += 1;
         this.setState({ context: newContext });
         this.setState({ example: newExample });
         this.setState({ type: 'example' });
@@ -73,9 +95,11 @@ class ActivityRunner extends React.Component {
 
   reportScore = score => {
     const { optimizer } = this.props;
-    const { item } = this.state;
-    const newContext = [...this.state.context];
-    newContext[this.state.progress % N_TESTS] = score > 0 ? 1 : -1;
+    const { item, context } = this.state;
+    const newContext = { ...context };
+    newContext.tests[this.state.progress % N_TESTS] = score > 0 ? 1 : -1;
+    newContext.latest = this.tests.map(_ => 0);
+    newContext.latest[this.state.progress % N_TESTS] = score > 0 ? 1 : -1;
     this.setState({ context: newContext });
     optimizer.report(0, item, score);
   };
@@ -85,9 +109,9 @@ class ActivityRunner extends React.Component {
 
     const { activityData, classes } = this.props;
     const { categories } = activityData.config;
-
     const { example, spinning, type } = this.state;
-    if (example === null) {
+
+    if (!example) {
       return (
         <div className={classes.container}>
           <pre className={classes.optimState}>
