@@ -7,20 +7,21 @@ import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 
+const H = 500;
 const styles = () => ({
   card: {
-    width: 400
+    width: H
   },
   media: {
-    height: 400,
+    height: H,
     backgroundColor: '#ddd',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   },
   image: {
-    maxWidth: 396,
-    maxHeight: 396,
+    maxWidth: H - 4,
+    maxHeight: H - 4,
     width: 'auto',
     height: 'auto'
   },

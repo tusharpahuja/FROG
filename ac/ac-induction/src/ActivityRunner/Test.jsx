@@ -12,26 +12,27 @@ import Collapse from 'material-ui/transitions/Collapse';
 import red from 'material-ui/colors/red';
 import green from 'material-ui/colors/green';
 
+const H = 500;
 const styles = () => ({
   card: {
-    width: 400
+    width: H
   },
   media: {
-    height: 400,
+    height: H,
     backgroundColor: '#ddd',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center'
   },
   image: {
-    maxWidth: 396,
-    maxHeight: 396,
+    maxWidth: H - 4,
+    maxHeight: H - 4,
     width: 'auto',
     height: 'auto'
   },
   button: {
     margin: 'auto',
-    width: '45%'
+    width: '40%'
   }
 });
 
