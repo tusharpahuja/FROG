@@ -12,19 +12,32 @@ const styles = () => ({
     width: 400
   },
   media: {
-    height: 400
+    height: 400,
+    backgroundColor: '#ddd',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  image: {
+    maxWidth: 396,
+    maxHeight: 396,
+    width: 'auto',
+    height: 'auto'
   },
   next: {
     marginLeft: 'auto'
   }
 });
 
-const Example = ({ example, next, classes }) => (
+const Example = ({ example, next, classes, config }) => (
   <Card className={classes.card}>
-    <CardMedia className={classes.media} image={example.url} title="Example" />
+    <div className={classes.media}>
+      <img src={example.url} className={classes.image} alt="example" />
+    </div>
     <CardContent>
       <Typography gutterBottom variant="headline" component="h2">
-        {example.category}
+        {config.prompts[config.categories.indexOf(example.category)] ||
+          example.category}
       </Typography>
     </CardContent>
     <CardActions>

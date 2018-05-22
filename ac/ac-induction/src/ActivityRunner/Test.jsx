@@ -14,14 +14,24 @@ import green from 'material-ui/colors/green';
 
 const styles = () => ({
   card: {
-    width: 450
+    width: 400
   },
   media: {
-    height: 450
+    height: 400,
+    backgroundColor: '#ddd',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  image: {
+    maxWidth: 396,
+    maxHeight: 396,
+    width: 'auto',
+    height: 'auto'
   },
   button: {
     margin: 'auto',
-    width: '30%'
+    width: '45%'
   }
 });
 
@@ -56,7 +66,8 @@ const StatelessTest = props => {
     classes,
     reportScore,
     feedback,
-    setFeedback
+    setFeedback,
+    config
   } = props;
   const onClick = category => {
     const correct = category === example.category ? 1 : 0;
@@ -81,14 +92,12 @@ const StatelessTest = props => {
 
   return (
     <Card className={classes.card}>
-      <CardMedia
-        className={classes.media}
-        image={example.url}
-        title="Example"
-      />
+      <div className={classes.media}>
+        <img src={example.url} className={classes.image} alt="example" />
+      </div>
       <CardContent>
         <Typography gutterBottom variant="headline" component="h3">
-          Which category is that example from?
+          {config.question}
         </Typography>
       </CardContent>
       <CardActions>
@@ -102,19 +111,9 @@ const StatelessTest = props => {
             disabled={!!feedback}
             style={getButtonStyle(category)}
           >
-            {category}
+            {config.answers[config.categories.indexOf(category)] || category}
           </Button>
         ))}
-        <Button
-          key="idk"
-          color="primary"
-          variant="raised"
-          onClick={() => onClick('idk')}
-          className={classes.button}
-          disabled={!!feedback}
-        >
-          I don't know
-        </Button>
       </CardActions>
       <Collapse in={!!feedback} timeout="auto" unmountOnExit>
         <Feedback {...feedback} next={next} classes={classes} />
