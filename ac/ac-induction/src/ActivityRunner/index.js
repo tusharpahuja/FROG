@@ -30,14 +30,15 @@ type StateT = {
     tests: number[],
     latest: number[]
   },
-  type?: string,
-  item?: string,
-  spinning?: boolean
+  type: string,
+  item: string,
+  spinning: boolean
 };
 
 class ActivityRunner extends React.Component<any, StateT> {
   tests: Object[];
   examples: Object[];
+  optimId: string;
 
   state = {
     progress: -1,
@@ -46,14 +47,18 @@ class ActivityRunner extends React.Component<any, StateT> {
       examples: [],
       tests: [],
       latest: []
-    }
+    },
+    item: '',
+    type: '',
+    spinning: false
   };
 
   constructor(props) {
     super(props);
-    const { examples, tests } = props.activityData.config;
+    const { examples, tests, optimId } = props.activityData.config;
     this.tests = tests;
     this.examples = examples;
+    this.optimId = optimId;
     this.state.context = {
       examples: examples.map(_ => 0),
       tests: tests.map(_ => 0),
@@ -61,10 +66,16 @@ class ActivityRunner extends React.Component<any, StateT> {
     };
   }
 
+  getContext() {
+    const { examples, tests, latest } = this.state.context;
+    return [...examples, ...tests, ...latest];
+  }
+
   nextExample = () => {
     const { optimizer } = this.props;
     this.setState({ spinning: true });
-    optimizer.recommend(0, (err, res) => {
+    const context = this.getContext();
+    optimizer.recommend(this.optimId, context, (err, res) => {
       if (err) {
         console.error(err);
       } else if (res) {
@@ -99,7 +110,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     newContext.latest[this.state.progress % this.tests.length] =
       score > 0 ? 1 : -1;
     this.setState({ context: newContext });
-    optimizer.report(0, item, score);
+    optimizer.report(this.optimId, this.getContext(), item, score);
   };
 
   render() {

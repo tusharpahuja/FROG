@@ -3,6 +3,10 @@
 export default {
   type: 'object',
   properties: {
+    optimId: {
+      title: 'Optimization Id',
+      type: 'string'
+    },
     categories: {
       title: 'List of categories',
       type: 'array',

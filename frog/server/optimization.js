@@ -3,14 +3,14 @@
 import { Meteor } from 'meteor/meteor';
 import { HTTP } from 'meteor/http';
 
-const url = 'http://128.179.161.166:8000';
+const url = 'http://128.179.162.123:8000';
 
 Meteor.methods({
-  'optim.recommend': context => {
+  'optim.recommend': (sessionId, context) => {
     if (Meteor.isServer) {
       const result = HTTP.post(url, {
         data: {
-          sessionId: 'EXPERIMENT_0',
+          sessionId,
           requestType: 'RECO',
           context
         }
@@ -18,11 +18,11 @@ Meteor.methods({
       return result;
     }
   },
-  'optim.report': (context, item, score) => {
+  'optim.report': (sessionId, context, item, score) => {
     if (Meteor.isServer) {
       const result = HTTP.post(url, {
         data: {
-          sessionId: 'EXPERIMENT_0',
+          sessionId,
           requestType: 'SCOR',
           context,
           item,

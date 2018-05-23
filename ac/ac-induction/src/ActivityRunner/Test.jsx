@@ -40,9 +40,7 @@ const Feedback = ({ correct, expected, next, classes }) => (
   <React.Fragment>
     <CardContent>
       <Typography paragraph variant="body1">
-        {correct
-          ? 'Bravo, you are right!'
-          : 'The correct answer was ' + expected}
+        {(correct && 'Bravo, you are right!') || 'Uh oh, that was incorrect!'}
       </Typography>
     </CardContent>
     <CardActions>
