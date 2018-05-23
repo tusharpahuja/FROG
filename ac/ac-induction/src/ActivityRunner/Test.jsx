@@ -4,7 +4,7 @@ import * as React from 'react';
 import { withState } from 'recompose';
 
 import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import Collapse from 'material-ui/transitions/Collapse';
@@ -36,7 +36,7 @@ const styles = () => ({
   }
 });
 
-const Feedback = ({ correct, expected, next, classes }) => (
+const Feedback = ({ correct, next, classes }) => (
   <React.Fragment>
     <CardContent>
       <Typography paragraph variant="body1">

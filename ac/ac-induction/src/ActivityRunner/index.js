@@ -152,8 +152,8 @@ class ActivityRunner extends React.Component<any, StateT> {
       );
     }
 
-    const Comp = { example: Example, test: Test }[type];
-    const next = { example: this.nextTest, test: this.nextExample }[type];
+    const Comp = type === 'example' ? Example : Test;
+    const next = type === 'example' ? this.nextTest : this.nextExample;
 
     return (
       <div className={classes.container}>

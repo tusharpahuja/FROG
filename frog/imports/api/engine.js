@@ -1,7 +1,6 @@
 // @flow
 
 import { Meteor } from 'meteor/meteor';
-import { HTTP } from 'meteor/http';
 import { Accounts } from 'meteor/accounts-base';
 import { type ActivityDbT } from 'frog-utils';
 
@@ -95,43 +94,7 @@ export const runSessionFn = (sessionId: string) => {
   }
 };
 
-const test = () => {
-  if (Meteor.isServer) {
-    console.log('Request');
-    // const http = new XMLHttpRequest();
-    const url = 'http://localhost:8000';
-    // const params = '{ "requestType": "INIT", "sessionId": "A" }';
-    // http.open("POST", url, true);
-    //
-    //
-    // // var xmlhttp = new XMLHttpRequest();   // new HttpRequest instance
-    // // xmlhttp.open("POST", "localhost:8000", true);
-    // // xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-    // // xmlhttp.send(JSON.stringify({ email: "hello@user.com", response: { name: "Tester" } }));
-    //
-    //
-    // // Send the proper header information along with the request
-    // http.setRequestHeader("Content-type", "application/json");
-    //
-    // http.onreadystatechange = function() {
-    //     console.log('http')
-    //     console.log(http)
-    //     if(http.readyState == 4 && http.status == 200) {
-    //         alert(http.responseText);
-    //     }
-    // }
-    // console.log('Sending')
-    // http.send(params);
-    const result = HTTP.post(url, {
-      data: { sessionId: 'json', requestType: 'RECO' }
-    });
-    console.log(result);
-    return result;
-  }
-};
-
 Meteor.methods({
   'run.session': runSessionFn,
-  'next.activity': runNextActivity,
-  optim: test
+  'next.activity': runNextActivity
 });

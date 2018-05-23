@@ -56,11 +56,6 @@ GraphEditor.displayName = 'GraphEditor';
 
 export default GraphEditor;
 
-const test = () => {
-  console.log('test');
-  Meteor.call('optim', (error, result) => console.log(error, result));
-};
-
 const bindKeys = () => {
   Mousetrap.bind('esc', () => {
     if (!store.ui.sidepanelOpen) {
@@ -71,7 +66,6 @@ const bindKeys = () => {
   Mousetrap.bind('backspace', () => store.deleteSelected(false));
   Mousetrap.bind('shift+backspace', () => store.deleteSelected(true));
   Mousetrap.bind('?', () => store.ui.setModal(true));
-  Mousetrap.bind('t', test);
   Mousetrap.bind('s', () => store.operatorStore.place('social'));
   Mousetrap.bind('+', () => store.activityStore.duplicateActivity());
   Mousetrap.bind('c', () => store.operatorStore.place('control'));
