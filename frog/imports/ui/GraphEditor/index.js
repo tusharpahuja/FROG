@@ -1,8 +1,6 @@
-import React, { Component } from 'react';
-
-import { Meteor } from 'meteor/meteor';
-
 // @flow
+
+import * as React from 'react';
 import { Provider } from 'mobx-react';
 import Mousetrap from 'mousetrap';
 import { withRouter } from 'react-router';
@@ -11,7 +9,7 @@ import { store } from './store';
 import { assignGraph } from '../../api/graphs';
 import EditorContainer from './EditorContainer';
 
-class AppClass extends Component<$FlowFixMeProps> {
+class AppClass extends React.Component<any> {
   componentWillMount() {
     store.setBrowserHistory(this.props.history);
     this.updateGraphId(this.props.match && this.props.match.params.graphId);

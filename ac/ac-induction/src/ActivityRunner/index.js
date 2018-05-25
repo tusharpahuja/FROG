@@ -124,8 +124,8 @@ class ActivityRunner extends React.Component<any, StateT> {
           <pre className={classes.optimState}>
             {JSON.stringify(this.state, null, 2)}
           </pre>
-          <p>Placeholder for consent form</p>
-          <button onClick={this.nextExample}>I want to participate</button>
+          <p>Are you up to the challenge?</p>
+          <button onClick={this.nextExample}>Start learning</button>
         </div>
       );
     }
