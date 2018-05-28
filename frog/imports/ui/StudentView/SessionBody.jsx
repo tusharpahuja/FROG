@@ -10,7 +10,6 @@ import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import { withStyles } from 'material-ui/styles';
-import { Accounts } from 'meteor/accounts-base';
 import { getInitialState, withDragDropContext } from 'frog-utils';
 import { compose, toClass } from 'recompose';
 
@@ -92,17 +91,6 @@ const StudentView = ({ activities, session, token, classes }) => (
                 Orchestration View
               </Button>
             )}
-          <Button
-            className={classes.button}
-            color="inherit"
-            onClick={() => {
-              Meteor.logout();
-              Accounts._unstoreLoginToken();
-              window.notReady();
-            }}
-          >
-            Logout
-          </Button>
         </Toolbar>
       </AppBar>
     </div>
