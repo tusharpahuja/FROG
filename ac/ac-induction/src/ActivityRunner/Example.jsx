@@ -10,7 +10,9 @@ import Typography from 'material-ui/Typography';
 const H = 500;
 const styles = () => ({
   card: {
-    width: H
+    width: H,
+    maxHeight: '100%',
+    overflow: 'auto'
   },
   media: {
     height: H,
@@ -25,8 +27,9 @@ const styles = () => ({
     width: 'auto',
     height: 'auto'
   },
-  next: {
-    marginLeft: 'auto'
+  button: {
+    margin: 'auto',
+    width: '40%'
   }
 });
 
@@ -42,7 +45,7 @@ const Example = ({ example, next, classes, config }) => (
       </Typography>
     </CardContent>
     <CardActions>
-      <Button color="primary" onClick={next} className={classes.next}>
+      <Button color="primary" onClick={next} className={classes.button}>
         Next
       </Button>
     </CardActions>

@@ -15,7 +15,9 @@ import green from 'material-ui/colors/green';
 const H = 500;
 const styles = () => ({
   card: {
-    width: H
+    width: H,
+    maxHeight: '100%',
+    overflow: 'auto'
   },
   media: {
     height: H,

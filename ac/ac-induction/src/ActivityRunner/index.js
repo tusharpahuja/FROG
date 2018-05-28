@@ -74,6 +74,7 @@ class ActivityRunner extends React.Component<any, StateT> {
   nextExample = () => {
     const { optimizer } = this.props;
     this.setState({ spinning: true });
+    this.setState({ progress: this.state.progress + 1 });
     const context = this.getContext();
     optimizer.recommend(this.optimId, context, (err, res) => {
       if (err) {
@@ -94,9 +95,9 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   nextTest = () => {
-    const newProgress = this.state.progress + 1;
-    this.setState({ progress: newProgress });
-    this.setState({ example: this.tests[newProgress % this.tests.length] });
+    this.setState({
+      example: this.tests[this.state.progress % this.tests.length]
+    });
     this.setState({ type: 'test' });
   };
 
@@ -121,9 +122,6 @@ class ActivityRunner extends React.Component<any, StateT> {
     if (!example) {
       return (
         <div className={classes.container}>
-          <pre className={classes.optimState}>
-            {JSON.stringify(this.state, null, 2)}
-          </pre>
           <p>Are you up to the challenge?</p>
           <button onClick={this.nextExample}>Start learning</button>
         </div>
@@ -133,20 +131,14 @@ class ActivityRunner extends React.Component<any, StateT> {
     if (spinning) {
       return (
         <div className={classes.container}>
-          <pre className={classes.optimState}>
-            {JSON.stringify(this.state, null, 2)}
-          </pre>
           <h1>PLEASE WAIT</h1>
         </div>
       );
     }
 
-    if (progress > 21) {
+    if (progress >= this.tests.length) {
       return (
         <div className={classes.container}>
-          <pre className={classes.optimState}>
-            {JSON.stringify(this.state, null, 2)}
-          </pre>
           <h1>Activity Completed !</h1>
         </div>
       );
@@ -157,9 +149,6 @@ class ActivityRunner extends React.Component<any, StateT> {
 
     return (
       <div className={classes.container}>
-        <pre className={classes.optimState}>
-          {JSON.stringify(this.state, null, 2)}
-        </pre>
         <Comp
           config={activityData.config}
           example={example}
