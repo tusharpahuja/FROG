@@ -140,6 +140,7 @@ class ActivityRunner extends React.Component<any, StateT> {
       return (
         <div className={classes.container}>
           <h1>Activity Completed !</h1>
+          <button onClick={window.close}>Close tab</button>
         </div>
       );
     }
