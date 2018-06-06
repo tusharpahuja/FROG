@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import redis from 'redis';
-import { mergeLog, archiveDashboardState } from '../imports/api/mergeLogData';
+import { mergeLog } from '../imports/api/mergeLogData';
+import { archiveDashboardState } from './dashboardSubscription';
 
 let clientRaw = null;
 if (
@@ -8,7 +9,6 @@ if (
   Meteor.settings.dashboardServer
 ) {
   clientRaw = redis.createClient();
-  clientRaw.on('connect', () => {});
   clientRaw.on('error', e => {
     console.error('Redis error', e);
   });
@@ -30,5 +30,5 @@ const loop = (err, result) => {
 };
 
 if (Meteor.settings.dashboardServer && client) {
-  client.blpop('frog.logs', 0, Meteor.bindEnvironment(loop));
+  client.blpop('frog.logs', 'frog.archive', 0, Meteor.bindEnvironment(loop));
 }

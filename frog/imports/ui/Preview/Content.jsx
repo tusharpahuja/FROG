@@ -12,7 +12,8 @@ import {
   cloneDeep,
   getInitialState,
   generateReactiveFn,
-  withDragDropContext
+  withDragDropContext,
+  uuid
 } from 'frog-utils';
 
 import ReactiveHOC from '../StudentView/ReactiveHOC';
@@ -25,7 +26,19 @@ import { addDefaultExample } from './index';
 import { getUserId } from './Controls';
 import LearningItem from '../LearningItem';
 
-const DocId = (acId, instance) => 'preview/' + acId + '/' + instance;
+const DocId = (acId, instance) => 'preview-' + acId + '/' + instance;
+
+export const generateDataFn = () => {
+  const doc = connection.get('li', uuid());
+  return generateReactiveFn(
+    doc,
+    LearningItem,
+    undefined,
+    undefined,
+    undefined,
+    backend
+  );
+};
 
 export const initActivityDocuments = (
   instances: string[],
@@ -123,6 +136,9 @@ const ContentController = ({
   const activityData = { data, config };
 
   const Run = ({ name, instance }) => {
+    if (activityType.meta.preview === false) {
+      return <h1>No preview available for this activity type</h1>;
+    }
     const docId = DocId(activityType.id, instance);
     const ActivityToRun = ReactiveHOC(
       docId,
@@ -147,10 +163,12 @@ const ContentController = ({
         activityType={activityType.id}
         key={reloadActivity}
         activityData={activityData}
+        activityId="preview"
         userInfo={{ name, id: getUserId(name) }}
         stream={() => undefined}
         logger={logger}
         groupingValue={instance}
+        sessionId={reloadActivity}
       />
     );
   };
@@ -182,6 +200,7 @@ const ContentController = ({
             name === 'dashboard' && activityType.dashboards ? (
               <MosaicWindow
                 title={'dashboard - ' + activityType.meta.name}
+                toolbarControls={[<div />]}
                 key={JSON.stringify({ config, showData })}
                 path={path}
               >
@@ -190,6 +209,7 @@ const ContentController = ({
             ) : (
               <MosaicWindow
                 path={path}
+                toolbarControls={[<div />]}
                 key={JSON.stringify({ config, showData, reloadActivity })}
                 title={
                   name +

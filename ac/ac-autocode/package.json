@@ -2,18 +2,18 @@
   "name": "ac-autocode",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
     "start": "nps"
   },
   "dependencies": {
     "frog-utils": "1.0.0",
     "react": "^16.3.1",
-    "react-ace": "^6.0.0",
+    "react-ace": "^6.1.1",
     "react-bootstrap": "^0.32.1",
     "react-dom": "^16.3.1",
     "styled-components": "^3.2.5",
-    "victory": "^0.25.7"
+    "victory": "^0.26.1"
   },
   "devDependencies": {
     "nps": "5.9.0"

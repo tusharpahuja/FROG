@@ -97,10 +97,9 @@ const Runner = ({ path, activity, sessionId, object, single }) => {
   if (single) {
     return Torun;
   } else {
-    const EMPTY_ARRAY: any[] = [];
     return (
       <MosaicWindow
-        toolbarControls={EMPTY_ARRAY}
+        toolbarControls={[<div />]}
         draggable={false}
         key={activity._id}
         path={path}
@@ -179,6 +178,7 @@ export class RunActivity extends React.Component<PropsT, {}> {
       <Activity
         key={this.props.reactiveId}
         activityData={this.props.activityData}
+        activityId={this.props.activityId}
         userInfo={{
           name: this.props.username,
           id: this.props.userid

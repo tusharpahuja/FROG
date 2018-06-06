@@ -5,19 +5,19 @@ import { activityTypes } from '/imports/activityTypes';
 import { addActivity } from '/imports/api/activities';
 import jsonSchemaDefaults from 'json-schema-defaults';
 
-import Divider from 'material-ui/Divider';
-import Grid from 'material-ui/Grid';
-import Typography from 'material-ui/Typography';
-import Button from 'material-ui/Button';
-import List from 'material-ui/List';
-import { withStyles } from 'material-ui/styles';
+import Divider from '@material-ui/core/Divider';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import List from '@material-ui/core/List';
+import { withStyles } from '@material-ui/core/styles';
 import Search from '@material-ui/icons/Search';
 import Cloud from '@material-ui/icons/Cloud';
 
 import { connect } from '../../store';
 import Library from '../../RemoteControllers/RemoteLibrary';
 import ListComponent from '../ListComponent';
-import { ModalPreview } from '../../../Preview';
+import Preview from '../../../Preview';
 
 type StateT = {
   expanded: ?string,
@@ -35,7 +35,8 @@ type PropsT = {
   setIdRemove?: Function,
   onlyHasPreview?: boolean,
   locallyChanged?: boolean,
-  changesLoaded?: Function
+  changesLoaded?: Function,
+  setActivityTypeId?: Function
 };
 
 const styles = {
@@ -217,18 +218,21 @@ class ChooseActivityTypeController extends Component<PropsT, StateT> {
 
         {this.props.store &&
           (this.props.store.ui.libraryOpen ? (
-            <Library
-              {...closeLibrary}
-              libraryType="activity"
-              setDelete={this.props.setDelete}
-              setIdRemove={this.props.setIdRemove}
-              activityId={this.props.activity._id}
-              store={this.props.store}
-              locallyChanged={this.props.locallyChanged}
-              changesLoaded={this.props.changesLoaded}
-              onSelect={this.props.onSelect}
-              searchStr={this.state.searchStr}
-            />
+            <Grid item xs={12} className={classes.activityList}>
+              <Library
+                {...closeLibrary}
+                libraryType="activity"
+                setDelete={this.props.setDelete}
+                setIdRemove={this.props.setIdRemove}
+                activityId={this.props.activity._id}
+                setActivityTypeId={this.props.setActivityTypeId}
+                store={this.props.store}
+                locallyChanged={this.props.locallyChanged}
+                changesLoaded={this.props.changesLoaded}
+                onSelect={this.props.onSelect}
+                searchStr={this.state.searchStr}
+              />
+            </Grid>
           ) : (
             <Grid item xs={12} className={classes.activityList}>
               {filteredList.length === 0 ? (
@@ -264,7 +268,8 @@ class ChooseActivityTypeController extends Component<PropsT, StateT> {
             </Grid>
           ))}
         {this.state.showInfo !== null && (
-          <ModalPreview
+          <Preview
+            modal
             activityTypeId={this.state.showInfo}
             dismiss={() => this.setState({ showInfo: null })}
           />

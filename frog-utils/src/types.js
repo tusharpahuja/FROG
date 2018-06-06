@@ -89,6 +89,7 @@ export type ActivityRunnerPropsT = {
   stream: (value: any, path: string[]) => void,
   uploadFn: (files: Array<any>, name: string) => Promise<*>,
   userInfo: { id: string, name: string },
+  activityId: string,
   groupingValue: string,
   sessionId: string
 };
@@ -138,7 +139,8 @@ export type ActivityPackageT = {
       data?: any,
       learningItems?: any,
       type?: 'deeplink'
-    }[]
+    }[],
+    preview?: boolean
   },
   config: Object,
   configUI?: Object,
@@ -148,7 +150,12 @@ export type ActivityPackageT = {
   ActivityRunner: ActivityRunnerT,
   dashboards?: { [name: string]: DashboardT },
   exportData?: (config: Object, product: activityDataT) => string,
-  formatProduct?: (config: Object, item: any, instanceId: string) => any,
+  formatProduct?: (
+    config: Object,
+    item: any,
+    instanceId: string,
+    username?: string
+  ) => any,
   ConfigComponent?: React.ComponentType<{
     configData: Object,
     setConfigData: Object => void,
@@ -160,6 +167,7 @@ export type DashboardT = {
   Viewer: React.ComponentType<DashboardViewerPropsT>,
   mergeLog: (state: any, log: LogDbT, activity: ActivityDbT) => void,
   prepareDataForDisplay?: (state: any, activity: ActivityDbT) => any,
+  reactiveToDisplay?: (reactive: any, activity: ActivityDbT) => any,
   initData: any,
   exampleLogs?: (
     | {
@@ -184,6 +192,7 @@ export type DashboardViewerPropsT = {
 export type productOperatorT = {
   id: string,
   type: 'product',
+  external?: boolean,
   meta: {
     name: string,
     shortName?: string,
@@ -202,6 +211,7 @@ export type productOperatorT = {
 export type controlOperatorT = {
   id: string,
   type: 'control',
+  external?: boolean,
   meta: {
     name: string,
     shortName?: string,
@@ -220,6 +230,7 @@ export type controlOperatorT = {
 export type socialOperatorT = {
   id: string,
   type: 'social',
+  external?: boolean,
   meta: {
     name: string,
     shortName?: string,
@@ -273,6 +284,7 @@ type LIRenderPropsT = {|
 |};
 
 export type LIRenderT = React.ComponentType<LIRenderPropsT>;
+type ImmutableLIT = { id: string, liDocument: Object };
 
 export type LIComponentPropsT =
   | {| type: 'history', id: string, render?: LIRenderT |}
@@ -284,12 +296,12 @@ export type LIComponentPropsT =
       autoInsert?: Boolean,
       meta?: Object
     |}
-  | {| type: 'view', id: string, render?: LIRenderT |}
+  | {| type: 'view', id: string | ImmutableLIT, render?: LIRenderT |}
   | {|
       type: 'thumbView',
-      id: string,
+      id: string | ImmutableLIT,
       render?: LIRenderT,
-      clickZoomable?: Boolean
+      clickZoomable?: boolean
     |}
   | {|
       type: 'edit',
