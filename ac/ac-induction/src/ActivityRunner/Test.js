@@ -3,14 +3,14 @@
 import * as React from 'react';
 import { withState } from 'recompose';
 
-import { withStyles } from 'material-ui/styles';
-import Card, { CardActions, CardContent } from 'material-ui/Card';
-import Button from 'material-ui/Button';
-import Typography from 'material-ui/Typography';
-import Collapse from 'material-ui/transitions/Collapse';
+import { withStyles } from '@material-ui/core/styles';
+import Card, { CardActions, CardContent } from '@material-ui/core/Card';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Collapse from '@material-ui/core/Collapse';
 
-import red from 'material-ui/colors/red';
-import green from 'material-ui/colors/green';
+import red from '@material-ui/core/colors/red';
+import green from '@material-ui/core/colors/green';
 
 import styles from './style';
 
