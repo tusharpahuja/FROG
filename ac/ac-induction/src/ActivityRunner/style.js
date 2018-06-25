@@ -24,6 +24,6 @@ export default () => ({
   },
   button: {
     margin: 'auto',
-    width: '40%'
+    width: '28%'
   }
 });

@@ -5,6 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 
 import Example from './Example';
 import Test from './Test';
+import SelfExplanation from './SelfExplanation';
 
 const styles = () => ({
   container: {
@@ -26,14 +27,36 @@ type StateT = {
   progress: number,
   example: ?Object,
   context: {
-    examples: number[],
-    tests: number[],
-    latest: number[]
+    pretest: number[]
   },
   type: string,
   item: string,
-  spinning: boolean
+  spinning: boolean,
+  subActivity: string
 };
+
+const Prompt = ({ classes, subActivity, start }) => (
+  <div className={classes.container}>
+    <p>
+      {
+        {
+          pretest: 'We will first test your knowledge on the topic',
+          learning: 'Time to learn! Ready for the challenge?',
+          posttest: "Let's test your knowledge again"
+        }[subActivity]
+      }
+    </p>
+    <button onClick={start}>
+      {
+        {
+          pretest: 'Start test',
+          learning: 'Start learning',
+          posttest: 'Start test'
+        }[subActivity]
+      }
+    </button>
+  </div>
+);
 
 class ActivityRunner extends React.Component<any, StateT> {
   tests: Object[];
@@ -44,13 +67,12 @@ class ActivityRunner extends React.Component<any, StateT> {
     progress: -1,
     example: null,
     context: {
-      examples: [],
-      tests: [],
-      latest: []
+      pretest: []
     },
     item: '',
     type: '',
-    spinning: false
+    spinning: false,
+    subActivity: 'pretest'
   };
 
   constructor(props) {
@@ -60,18 +82,16 @@ class ActivityRunner extends React.Component<any, StateT> {
     this.examples = examples;
     this.optimId = optimId;
     this.state.context = {
-      examples: examples.map(_ => 0),
-      tests: tests.map(_ => 0),
-      latest: tests.map(_ => 0)
+      pretest: tests.map(_ => 0)
     };
   }
 
   getContext() {
-    const { examples, tests, latest } = this.state.context;
-    return [...examples, ...tests, ...latest];
+    const { pretest } = this.state.context;
+    return [...pretest];
   }
 
-  nextExample = () => {
+  nextLearningActivity = () => {
     const { optimizer } = this.props;
     this.setState({ spinning: true });
     this.setState({ progress: this.state.progress + 1 });
@@ -95,10 +115,13 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   nextTest = () => {
-    this.setState({
-      example: this.tests[this.state.progress % this.tests.length]
-    });
-    this.setState({ type: 'test' });
+    const progress = this.state.progress + 1;
+    if (progress < this.tests.length) {
+      const example = this.tests[progress];
+      this.setState({ example, progress });
+    } else {
+      this.setState({ example: null, subActivity: 'learning' });
+    }
   };
 
   reportScore = score => {
@@ -111,20 +134,37 @@ class ActivityRunner extends React.Component<any, StateT> {
     newContext.latest[this.state.progress % this.tests.length] =
       score > 0 ? 1 : -1;
     this.setState({ context: newContext });
-    optimizer.report(this.optimId, this.getContext(), item, score);
+    if (this.state.subActivity == 'posttest') {
+      optimizer.report(this.optimId, this.getContext(), item, score);
+    }
+  };
+
+  handlePretestResult = score => {
+    const { progress, context } = this.state;
+    context.pretest[progress] = score > 0 ? 1 : -1;
+    this.setState({ context });
   };
 
   render() {
     const { activityData, classes } = this.props;
     const { categories } = activityData.config;
-    const { example, spinning, type, progress } = this.state;
+    const { example, spinning, type, progress, subActivity } = this.state;
 
     if (!example) {
       return (
         <div className={classes.container}>
-          <p>Are you up to the challenge?</p>
-          <button onClick={this.nextExample}>Start learning</button>
+          <SelfExplanation next={this.nextTest} />
         </div>
+      );
+    }
+
+    if (!example) {
+      return (
+        <Prompt
+          classes={classes}
+          subActivity={subActivity}
+          start={this.nextTest}
+        />
       );
     }
 
@@ -132,6 +172,20 @@ class ActivityRunner extends React.Component<any, StateT> {
       return (
         <div className={classes.container}>
           <h1>PLEASE WAIT</h1>
+        </div>
+      );
+    }
+
+    if (subActivity === 'pretest') {
+      return (
+        <div className={classes.container}>
+          <Test
+            config={activityData.config}
+            example={example}
+            next={this.nextTest}
+            categories={categories}
+            submitResult={this.handlePretestResult}
+          />
         </div>
       );
     }
@@ -146,7 +200,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     }
 
     const Comp = type === 'example' ? Example : Test;
-    const next = type === 'example' ? this.nextTest : this.nextExample;
+    const next = type === 'example' ? this.nextTest : this.nextLearningActivity;
 
     return (
       <div className={classes.container}>
@@ -155,7 +209,6 @@ class ActivityRunner extends React.Component<any, StateT> {
           example={example}
           next={next}
           categories={categories}
-          withFeedback
           optimizer={this.props.optimizer}
           reportScore={this.reportScore}
         />
