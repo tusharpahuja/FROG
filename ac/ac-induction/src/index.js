@@ -2,7 +2,7 @@
 
 import { type ActivityPackageT } from 'frog-utils';
 
-import config from './config';
+import { config, configUI } from './config';
 import ActivityRunner from './ActivityRunner';
 
 const meta = {
@@ -73,6 +73,7 @@ export default ({
   id: 'ac-induction',
   type: 'react-component',
   config,
+  configUI,
   meta,
   ActivityRunner,
   dataStructure: { progress: 0 }

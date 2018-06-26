@@ -1,6 +1,6 @@
 // @flow
 
-export default {
+export const config = {
   type: 'object',
   properties: {
     optimId: {
@@ -26,8 +26,33 @@ export default {
       type: 'array',
       items: { type: 'string' }
     },
+    definition: {
+      title: 'Definition',
+      type: 'string'
+    },
     examples: {
-      title: 'Examplex',
+      title: 'Examples',
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          url: {
+            title: 'url',
+            type: 'string'
+          },
+          category: {
+            title: 'category',
+            type: 'string'
+          },
+          hint: {
+            title: 'hint',
+            type: 'string'
+          }
+        }
+      }
+    },
+    testsWithFeedback: {
+      title: 'TestWithFeedback',
       type: 'array',
       items: {
         type: 'object',
@@ -60,5 +85,11 @@ export default {
         }
       }
     }
+  }
+};
+
+export const configUI = {
+  definition: {
+    'ui:widget': 'textarea'
   }
 };
