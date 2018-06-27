@@ -22,6 +22,9 @@ const Example = ({ example, next, classes, config }) => (
         {config.prompts[config.categories.indexOf(example.category)] ||
           example.category}
       </Typography>
+      <Typography gutterBottom component="p">
+        {example.hint}
+      </Typography>
     </CardContent>
     <CardActions>
       <Button color="primary" onClick={next} className={classes.button}>

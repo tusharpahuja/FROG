@@ -26,6 +26,10 @@ export const config = {
       type: 'array',
       items: { type: 'string' }
     },
+    explanationPrompt: {
+      title: 'Prompt for self-explanation card',
+      type: 'string'
+    },
     definition: {
       title: 'Definition',
       type: 'string'

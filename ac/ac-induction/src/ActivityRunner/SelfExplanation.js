@@ -14,11 +14,11 @@ import TextField from '@material-ui/core/TextField';
 
 import styles from './style';
 
-const SelfExplanation = ({ classes, setText, next }) => (
+const SelfExplanation = ({ classes, setText, next, config }) => (
   <Card className={classes.card}>
     <CardContent>
       <Typography gutterBottom variant="headline" component="h2">
-        Explain in your own words what you think a SET is.
+        {config.explanationPrompt}
       </Typography>
       <TextField
         onChange={e => setText(e.target.value)}

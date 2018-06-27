@@ -1,7 +1,6 @@
 // @flow
 
 import * as React from 'react';
-import { compose, withState } from 'recompose';
 
 import { withStyles } from '@material-ui/core/styles';
 

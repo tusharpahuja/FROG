@@ -58,6 +58,14 @@ const Prompt = ({ subActivity, next }) => (
   </React.Fragment>
 );
 
+const End = ({ score }) => (
+  <React.Fragment>
+    <h1>Activity Completed !</h1>
+    <p>You scored {score} on the final test</p>
+    <button onClick={window.close}>Close tab</button>
+  </React.Fragment>
+);
+
 class ActivityRunner extends React.Component<any, StateT> {
   tests: Object[];
   examples: Object[];
@@ -78,14 +86,19 @@ class ActivityRunner extends React.Component<any, StateT> {
 
   constructor(props) {
     super(props);
-    const { config } = props.activityData;
-    const { tests, categories } = config;
+    const { tests } = props.activityData.config;
 
     this.state.context = {
       pretest: tests.map(_ => 0)
     };
 
     this.cards = [];
+    this.getPretest();
+  }
+
+  getPretest() {
+    const { config } = this.props.activityData;
+    const { tests, categories } = config;
     this.cards.push(<Prompt subActivity="pretest" next={this.next} />);
     tests.forEach(test => {
       this.cards.push(
@@ -100,17 +113,10 @@ class ActivityRunner extends React.Component<any, StateT> {
     });
   }
 
-  getContext() {
-    const { pretest } = this.state.context;
-    return [...pretest];
-  }
-
   getLearningActivities = () => {
     const { config } = this.props.activityData;
-    const { examples, tests, categories, definition } = config;
-
+    const { examples, categories, definition } = config;
     this.cards.push(<Prompt subActivity="learning" next={this.next} />);
-
     examples.forEach(example => {
       this.cards.push(
         <Example
@@ -118,29 +124,11 @@ class ActivityRunner extends React.Component<any, StateT> {
           example={example}
           next={this.next}
           categories={categories}
-          optimizer={this.props.optimizer}
-          reportScore={this.reportScore}
         />
       );
     });
-
-    this.cards.push(<SelfExplanation next={this.next} />);
+    this.cards.push(<SelfExplanation next={this.next} config={config} />);
     this.cards.push(<Definition next={this.next} definition={definition} />);
-    this.cards.push(<Prompt subActivity="posttest" next={this.next} />);
-
-    tests.forEach((test, i) => {
-      this.cards.push(
-        <Test
-          config={config}
-          example={test}
-          next={this.next}
-          categories={categories}
-          submitResult={this.handlePretestResult}
-        />
-      );
-    });
-
-    this.cards.push(<Prompt subActivity="posttest" next={this.next} />);
 
     // const { optimizer } = this.props;
     // this.setState({ spinning: true });
@@ -164,15 +152,53 @@ class ActivityRunner extends React.Component<any, StateT> {
     // });
   };
 
+  getPostTest() {
+    const { config } = this.props.activityData;
+    const { tests, categories } = config;
+    this.cards.push(<Prompt subActivity="posttest" next={this.next} />);
+
+    tests.forEach(test => {
+      this.cards.push(
+        <Test
+          config={config}
+          example={test}
+          next={this.next}
+          categories={categories}
+          submitResult={this.handlePosttestResult}
+        />
+      );
+    });
+  }
+
+  getEnd() {
+    this.cards.push(<End score="50%" />);
+  }
+
   next = () => {
     const progress = this.state.progress + 1;
     if (progress >= this.cards.length) {
-      this.getLearningActivities();
+      if (this.state.subActivity === 'pretest') {
+        this.getLearningActivities();
+        this.setState({ subActivity: 'learning' });
+      } else if (this.state.subActivity === 'learning') {
+        this.getPostTest();
+        this.setState({ subActivity: 'posttest' });
+      } else if (this.state.subActivity === 'posttest') {
+        this.getEnd();
+        this.setState({ subActivity: 'end' });
+      }
     }
     this.setState({ progress });
   };
 
-  reportScore = () => {
+  handlePretestResult = score => {
+    const { progress, context } = this.state;
+    context.pretest[progress] = score > 0 ? 1 : -1;
+    this.setState({ context });
+  };
+
+  handlePosttestResult = score => {
+    console.log('handlePosttest', score);
     // const { optimizer } = this.props;
     // const { item, context } = this.state;
     // const newContext = { ...context };
@@ -187,15 +213,8 @@ class ActivityRunner extends React.Component<any, StateT> {
     // }
   };
 
-  handlePretestResult = score => {
-    const { progress, context } = this.state;
-    context.pretest[progress] = score > 0 ? 1 : -1;
-    this.setState({ context });
-  };
-
   render() {
-    const { progress } = this.state;
-    return this.cards[progress];
+    return this.cards[this.state.progress];
   }
 }
 
