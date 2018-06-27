@@ -26,11 +26,8 @@ const styles = () => ({
 
 type StateT = {
   progress: number,
-  context: {
-    pretest: number[]
-  },
-  type: string,
-  item: string,
+  pretest: number[],
+  posttest: number[],
   spinning: boolean,
   subActivity: string
 };
@@ -67,30 +64,19 @@ const End = ({ score }) => (
 );
 
 class ActivityRunner extends React.Component<any, StateT> {
-  tests: Object[];
-  examples: Object[];
   optimId: string;
   cards: Object[];
-  next = Function;
 
   state = {
     progress: 0,
-    context: {
-      pretest: []
-    },
-    item: '',
-    type: '',
+    pretest: [],
+    posttest: [],
     spinning: false,
     subActivity: 'pretest'
   };
 
   constructor(props) {
     super(props);
-    const { tests } = props.activityData.config;
-
-    this.state.context = {
-      pretest: tests.map(_ => 0)
-    };
 
     this.cards = [];
     this.getPretest();
@@ -171,7 +157,11 @@ class ActivityRunner extends React.Component<any, StateT> {
   }
 
   getEnd() {
-    this.cards.push(<End score="50%" />);
+    const { posttest } = this.state;
+    const score =
+      Math.ceil(100 * posttest.filter(x => x > 0).length / posttest.length) +
+      '%';
+    this.cards.push(<End score={score} />);
   }
 
   next = () => {
@@ -192,13 +182,18 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   handlePretestResult = score => {
-    const { progress, context } = this.state;
-    context.pretest[progress] = score > 0 ? 1 : -1;
-    this.setState({ context });
+    console.log(this.state);
+    const { pretest } = this.state;
+    pretest.push(score > 0 ? 1 : -1);
+    this.setState({ pretest });
   };
 
   handlePosttestResult = score => {
     console.log('handlePosttest', score);
+    console.log(this.state);
+    const { posttest } = this.state;
+    posttest.push(score > 0 ? 1 : -1);
+    this.setState({ posttest });
     // const { optimizer } = this.props;
     // const { item, context } = this.state;
     // const newContext = { ...context };
