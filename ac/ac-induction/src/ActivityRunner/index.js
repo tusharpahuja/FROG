@@ -66,6 +66,7 @@ const End = ({ score }) => (
 class ActivityRunner extends React.Component<any, StateT> {
   optimId: string;
   cards: Object[];
+  N: number;
 
   state = {
     progress: 0,
@@ -79,6 +80,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     super(props);
 
     this.cards = [];
+    this.N = 8 + 5 + 8 + 3;
     this.getPretest();
   }
 
@@ -94,6 +96,7 @@ class ActivityRunner extends React.Component<any, StateT> {
           next={this.next}
           categories={categories}
           submitResult={this.handlePretestResult}
+          logger={this.props.logger}
         />
       );
     });
@@ -110,11 +113,24 @@ class ActivityRunner extends React.Component<any, StateT> {
           example={example}
           next={this.next}
           categories={categories}
+          logger={this.props.logger}
         />
       );
     });
-    this.cards.push(<SelfExplanation next={this.next} config={config} />);
-    this.cards.push(<Definition next={this.next} definition={definition} />);
+    this.cards.push(
+      <SelfExplanation
+        next={this.next}
+        config={config}
+        logger={this.props.logger}
+      />
+    );
+    this.cards.push(
+      <Definition
+        next={this.next}
+        definition={definition}
+        logger={this.props.logger}
+      />
+    );
 
     // const { optimizer } = this.props;
     // this.setState({ spinning: true });
@@ -151,6 +167,7 @@ class ActivityRunner extends React.Component<any, StateT> {
           next={this.next}
           categories={categories}
           submitResult={this.handlePosttestResult}
+          logger={this.props.logger}
         />
       );
     });
@@ -166,6 +183,7 @@ class ActivityRunner extends React.Component<any, StateT> {
 
   next = () => {
     const progress = this.state.progress + 1;
+    this.props.logger({ type: 'progress', value: progress / this.N });
     if (progress >= this.cards.length) {
       if (this.state.subActivity === 'pretest') {
         this.getLearningActivities();
@@ -182,15 +200,14 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   handlePretestResult = score => {
-    console.log(this.state);
+    this.props.logger({ type: 'pretest', value: score });
     const { pretest } = this.state;
     pretest.push(score > 0 ? 1 : -1);
     this.setState({ pretest });
   };
 
   handlePosttestResult = score => {
-    console.log('handlePosttest', score);
-    console.log(this.state);
+    this.props.logger({ type: 'posttest', value: score });
     const { posttest } = this.state;
     posttest.push(score > 0 ? 1 : -1);
     this.setState({ posttest });

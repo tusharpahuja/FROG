@@ -12,22 +12,29 @@ import Typography from '@material-ui/core/Typography';
 
 import styles from './style';
 
-const Definition = ({ classes, next, definition }) => (
-  <Card className={classes.card}>
-    <CardContent>
-      <Typography gutterBottom variant="headline" component="h2">
-        Definition
-      </Typography>
-      <Typography gutterBottom component="p">
-        {definition}
-      </Typography>
-    </CardContent>
-    <CardActions>
-      <Button color="primary" onClick={next} className={classes.button}>
-        Next
-      </Button>
-    </CardActions>
-  </Card>
-);
+const Definition = ({ classes, next, definition, logger }) => {
+  const onClick = () => {
+    logger({ type: 'definition' });
+    next();
+  };
+
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography gutterBottom variant="headline" component="h2">
+          Definition
+        </Typography>
+        <Typography gutterBottom component="p">
+          {definition}
+        </Typography>
+      </CardContent>
+      <CardActions>
+        <Button color="primary" onClick={onClick} className={classes.button}>
+          Next
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
 
 export default withStyles(styles)(Definition);

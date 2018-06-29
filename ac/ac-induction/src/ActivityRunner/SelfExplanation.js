@@ -14,28 +14,35 @@ import TextField from '@material-ui/core/TextField';
 
 import styles from './style';
 
-const SelfExplanation = ({ classes, setText, next, config }) => (
-  <Card className={classes.card}>
-    <CardContent>
-      <Typography gutterBottom variant="headline" component="h2">
-        {config.explanationPrompt}
-      </Typography>
-      <TextField
-        onChange={e => setText(e.target.value)}
-        fullWidth
-        multiline
-        placeholder="Write here"
-        rows="6"
-        rowsMax="16"
-      />
-    </CardContent>
-    <CardActions>
-      <Button color="primary" onClick={next} className={classes.button}>
-        Next
-      </Button>
-    </CardActions>
-  </Card>
-);
+const SelfExplanation = ({ classes, setText, next, text, config, logger }) => {
+  const onClick = () => {
+    logger({ type: 'selfExplanation', value: text });
+    next();
+  };
+
+  return (
+    <Card className={classes.card}>
+      <CardContent>
+        <Typography gutterBottom variant="headline" component="h2">
+          {config.explanationPrompt}
+        </Typography>
+        <TextField
+          onChange={e => setText(e.target.value)}
+          fullWidth
+          multiline
+          placeholder="Write here"
+          rows="6"
+          rowsMax="16"
+        />
+      </CardContent>
+      <CardActions>
+        <Button color="primary" onClick={onClick} className={classes.button}>
+          Next
+        </Button>
+      </CardActions>
+    </Card>
+  );
+};
 
 export default compose(
   withStyles(styles),
