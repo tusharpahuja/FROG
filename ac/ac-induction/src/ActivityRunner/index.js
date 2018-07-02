@@ -1,10 +1,13 @@
 // @flow
 
 import * as React from 'react';
+import { shuffle } from 'lodash';
+
 import { withStyles } from '@material-ui/core/styles';
 
 import Example from './Example';
 import Test from './Test';
+import TestWithFeedback from './TestWithFeedback';
 import SelfExplanation from './SelfExplanation';
 import Definition from './Definition';
 
@@ -104,10 +107,21 @@ class ActivityRunner extends React.Component<any, StateT> {
 
   getLearningActivities = () => {
     const { config } = this.props.activityData;
-    const { examples, categories, definition } = config;
+    const { examples, categories, definition, testsWithFeedback } = config;
     this.cards.push(<Prompt subActivity="learning" next={this.next} />);
-    examples.forEach(example => {
-      this.cards.push(
+
+    const learningActivities = [
+      ...testsWithFeedback.map(example => (
+        <TestWithFeedback
+          key={example.url}
+          config={config}
+          example={example}
+          next={this.next}
+          categories={categories}
+          logger={this.props.logger}
+        />
+      )),
+      ...examples.map(example => (
         <Example
           config={config}
           example={example}
@@ -115,22 +129,22 @@ class ActivityRunner extends React.Component<any, StateT> {
           categories={categories}
           logger={this.props.logger}
         />
-      );
-    });
-    this.cards.push(
+      )),
       <SelfExplanation
         next={this.next}
         config={config}
         logger={this.props.logger}
-      />
-    );
-    this.cards.push(
+      />,
       <Definition
         next={this.next}
         definition={definition}
         logger={this.props.logger}
       />
-    );
+    ];
+
+    shuffle(learningActivities)
+      .slice(0, 5)
+      .forEach(i => this.cards.push(i));
 
     // const { optimizer } = this.props;
     // this.setState({ spinning: true });

@@ -38,24 +38,18 @@ const Feedback = ({ correct, next, classes }) => (
 const StatelessTest = props => {
   const {
     example,
-    withFeedback,
     categories,
     next,
     classes,
-    reportScore,
     feedback,
     setFeedback,
     config
   } = props;
+
   const onClick = category => {
     const correct = category === example.category ? 1 : 0;
     const expected = example.category;
-    reportScore(correct);
     setFeedback({ selected: category, expected, correct });
-
-    if (!withFeedback) {
-      next();
-    }
   };
 
   const getButtonStyle = category => {
