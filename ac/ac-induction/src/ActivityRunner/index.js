@@ -100,6 +100,7 @@ class ActivityRunner extends React.Component<any, StateT> {
           categories={categories}
           submitResult={this.handlePretestResult}
           logger={this.props.logger}
+          skip={this.skipPretest}
         />
       );
     });
@@ -194,6 +195,12 @@ class ActivityRunner extends React.Component<any, StateT> {
       '%';
     this.cards.push(<End score={score} />);
   }
+
+  skipPretest = () => {
+    this.setState({ progress: this.cards.length });
+    this.getLearningActivities();
+    this.setState({ subActivity: 'learning' });
+  };
 
   next = () => {
     const progress = this.state.progress + 1;

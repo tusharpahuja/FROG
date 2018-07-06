@@ -12,7 +12,15 @@ import Typography from '@material-ui/core/Typography';
 import styles from './style';
 
 const Test = props => {
-  const { example, categories, next, classes, submitResult, config } = props;
+  const {
+    example,
+    categories,
+    next,
+    classes,
+    submitResult,
+    config,
+    skip
+  } = props;
   const onClick = category => {
     submitResult(category === example.category ? 1 : 0);
     next();
@@ -41,6 +49,13 @@ const Test = props => {
           </Button>
         ))}
       </CardActions>
+      {skip && (
+        <CardActions>
+          <Button size="small" onClick={skip} style={{ marginLeft: 'auto' }}>
+            I don't know anything, skip the test
+          </Button>
+        </CardActions>
+      )}
     </Card>
   );
 };
