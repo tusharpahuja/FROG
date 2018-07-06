@@ -186,6 +186,14 @@ class ActivityRunner extends React.Component<any, StateT> {
         />
       );
     });
+
+    this.cards.push(
+      <SelfExplanation
+        next={this.next}
+        config={config}
+        logger={this.props.logger}
+      />
+    );
   }
 
   getEnd() {
