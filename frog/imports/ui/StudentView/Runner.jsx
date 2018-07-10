@@ -22,11 +22,11 @@ const getStructure = activity => {
 };
 
 const optimizer = {
-  recommend: (sessionId, context, callback) => {
-    Meteor.call('optim.recommend', sessionId, context, callback);
+  recommend: (sessionId, callback) => {
+    Meteor.call('optim.recommend', sessionId, callback);
   },
-  report: (sessionId, context, item, score, callback) => {
-    Meteor.call('optim.report', sessionId, context, item, score, callback);
+  report: (sessionId, sequence, result, callback) => {
+    Meteor.call('optim.report', sessionId, sequence, result, callback);
   }
 };
 

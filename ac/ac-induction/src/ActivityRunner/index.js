@@ -100,7 +100,6 @@ const EndPrompt = ({ classes, score }) => (
 );
 
 class ActivityRunner extends React.Component<any, StateT> {
-  optimId: string;
   cards: Object[];
   N: number;
 
@@ -183,31 +182,24 @@ class ActivityRunner extends React.Component<any, StateT> {
         logger={this.props.logger}
       />
     ];
+    console.log('hi');
 
-    shuffle(learningActivities)
-      .slice(0, 5)
-      .forEach(i => this.cards.push(i));
-
-    // const { optimizer } = this.props;
-    // this.setState({ spinning: true });
-    // this.setState({ progress: this.state.progress + 1 });
-    // const context = this.getContext();
-    // optimizer.recommend(this.optimId, context, (err, res) => {
-    //   if (err) {
-    //     console.error(err);
-    //   } else if (res) {
-    //     const reco = res.data.msg;
-    //     const idx = parseInt(reco, 10);
-    //     const newExample = this.examples[idx];
-    //     const newContext = { ...this.state.context };
-    //     newContext.examples[idx] += 1;
-    //     this.setState({ context: newContext });
-    //     this.setState({ example: newExample });
-    //     this.setState({ type: 'example' });
-    //     this.setState({ item: reco });
-    //     this.setState({ spinning: false });
-    //   }
-    // });
+    const { optimizer } = this.props;
+    this.setState({ spinning: true });
+    optimizer.recommend(config.optimId, (err, res) => {
+      console.log('hello');
+      if (err) {
+        console.error(err);
+        shuffle(learningActivities)
+          .slice(0, 5)
+          .forEach(i => this.cards.push(i));
+      } else if (res) {
+        const reco = res.data;
+        console.log(reco);
+      }
+      this.setState({ spinning: false });
+    });
+    console.log('bye');
   };
 
   getPostTest() {
@@ -298,7 +290,9 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   render() {
-    return (
+    return this.state.spinning ? (
+      <h1>Please Wait</h1>
+    ) : (
       <React.Fragment>
         <ProgressBar progress={this.state.progress} />
         {this.cards[this.state.progress]}

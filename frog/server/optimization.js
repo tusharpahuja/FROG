@@ -6,30 +6,28 @@ import { HTTP } from 'meteor/http';
 const url = 'http://159.69.15.228:8000';
 
 Meteor.methods({
-  'optim.recommend': (sessionId, context) => {
+  'optim.recommend': sessionId => {
     if (Meteor.isServer) {
-      const result = HTTP.post(url, {
+      const query = HTTP.post(url, {
         data: {
           sessionId,
-          requestType: 'RECO',
-          context
+          requestType: 'RECO'
         }
       });
-      return result;
+      return query;
     }
   },
-  'optim.report': (sessionId, context, item, score) => {
+  'optim.report': (sessionId, sequence, result) => {
     if (Meteor.isServer) {
-      const result = HTTP.post(url, {
+      const query = HTTP.post(url, {
         data: {
           sessionId,
           requestType: 'SCOR',
-          context,
-          item,
-          score
+          sequence,
+          result
         }
       });
-      return result;
+      return query;
     }
   }
 });
