@@ -4,28 +4,20 @@ import * as React from 'react';
 import { shuffle } from 'lodash';
 
 import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
 
 import Example from './Example';
 import Test from './Test';
 import TestWithFeedback from './TestWithFeedback';
 import SelfExplanation from './SelfExplanation';
 import Definition from './Definition';
+import ProgressBar from './ProgressBar';
 
-const styles = () => ({
-  container: {
-    width: '100%',
-    height: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'column'
-  },
-  optimState: {
-    position: 'fixed',
-    top: '50px',
-    left: '10px'
-  }
-});
+import styles from './style';
 
 type StateT = {
   progress: number,
@@ -35,35 +27,76 @@ type StateT = {
   subActivity: string
 };
 
-const Prompt = ({ subActivity, next }) => (
-  <React.Fragment>
-    <p>
-      {
-        {
-          pretest: 'We will first test your knowledge on the topic',
-          learning: 'Time to learn! Ready for the challenge?',
-          posttest: "Let's test your knowledge again"
-        }[subActivity]
-      }
-    </p>
-    <button onClick={next}>
-      {
-        {
-          pretest: 'Start test',
-          learning: 'Start learning',
-          posttest: 'Start test'
-        }[subActivity]
-      }
-    </button>
-  </React.Fragment>
+const PretestPrompt = ({ classes, skip, next, introduction }) => (
+  <Card className={classes.prompt}>
+    <CardContent>
+      <Typography gutterBottom variant="subheading">
+        {introduction}
+      </Typography>
+    </CardContent>
+    <CardActions>
+      <Button color="primary" onClick={next} className={classes.promptButton}>
+        Yes, I know it already! Take the test.
+      </Button>
+    </CardActions>
+    <CardActions>
+      <Button color="primary" onClick={skip} className={classes.promptButton}>
+        No, I don't know it. Skip the test
+      </Button>
+    </CardActions>
+  </Card>
 );
 
-const End = ({ score }) => (
-  <React.Fragment>
-    <h1>Activity Completed !</h1>
-    <p>You scored {score} on the final test</p>
-    <button onClick={window.close}>Close tab</button>
-  </React.Fragment>
+const LearningPrompt = ({ classes, next }) => (
+  <Card className={classes.prompt}>
+    <CardContent>
+      <Typography gutterBottom component="h3">
+        Time to learn! Ready for the challenge?
+      </Typography>
+    </CardContent>
+    <CardActions>
+      <Button color="primary" onClick={next} className={classes.promptButton}>
+        Start Learning
+      </Button>
+    </CardActions>
+  </Card>
+);
+
+const PosttestPrompt = ({ classes, next }) => (
+  <Card className={classes.prompt}>
+    <CardContent>
+      <Typography gutterBottom component="h3">
+        Let's see how much you learned
+      </Typography>
+    </CardContent>
+    <CardActions>
+      <Button color="primary" onClick={next} className={classes.promptButton}>
+        Start the test
+      </Button>
+    </CardActions>
+  </Card>
+);
+
+const EndPrompt = ({ classes, score }) => (
+  <Card className={classes.prompt}>
+    <CardContent>
+      <Typography gutterBottom variant="headline" component="h3">
+        Activity Completed !
+      </Typography>
+      <Typography gutterBottom component="p">
+        You scored {score} on the final test
+      </Typography>
+    </CardContent>
+    <CardActions>
+      <Button
+        color="primary"
+        onClick={window.close}
+        className={classes.promptButton}
+      >
+        Close tab
+      </Button>
+    </CardActions>
+  </Card>
 );
 
 class ActivityRunner extends React.Component<any, StateT> {
@@ -81,16 +114,22 @@ class ActivityRunner extends React.Component<any, StateT> {
 
   constructor(props) {
     super(props);
-
     this.cards = [];
-    this.N = 8 + 5 + 8 + 3;
+    this.N = 8 + 5 + 8 + 3 + 1;
     this.getPretest();
   }
 
   getPretest() {
     const { config } = this.props.activityData;
     const { tests, categories } = config;
-    this.cards.push(<Prompt subActivity="pretest" next={this.next} />);
+    this.cards.push(
+      <PretestPrompt
+        introduction={config.introduction}
+        classes={this.props.classes}
+        next={this.next}
+        skip={this.skipPretest}
+      />
+    );
     tests.forEach(test => {
       this.cards.push(
         <Test
@@ -109,7 +148,9 @@ class ActivityRunner extends React.Component<any, StateT> {
   getLearningActivities = () => {
     const { config } = this.props.activityData;
     const { examples, categories, definition, testsWithFeedback } = config;
-    this.cards.push(<Prompt subActivity="learning" next={this.next} />);
+    this.cards.push(
+      <LearningPrompt classes={this.props.classes} next={this.next} />
+    );
 
     const learningActivities = [
       ...testsWithFeedback.map(example => (
@@ -172,7 +213,9 @@ class ActivityRunner extends React.Component<any, StateT> {
   getPostTest() {
     const { config } = this.props.activityData;
     const { tests, categories } = config;
-    this.cards.push(<Prompt subActivity="posttest" next={this.next} />);
+    this.cards.push(
+      <PosttestPrompt classes={this.props.classes} next={this.next} />
+    );
 
     tests.forEach(test => {
       this.cards.push(
@@ -201,7 +244,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     const score =
       Math.ceil(100 * posttest.filter(x => x > 0).length / posttest.length) +
       '%';
-    this.cards.push(<End score={score} />);
+    this.cards.push(<EndPrompt classes={this.props.classes} score={score} />);
   }
 
   skipPretest = () => {
@@ -255,7 +298,12 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   render() {
-    return this.cards[this.state.progress];
+    return (
+      <React.Fragment>
+        <ProgressBar progress={this.state.progress} />
+        {this.cards[this.state.progress]}
+      </React.Fragment>
+    );
   }
 }
 

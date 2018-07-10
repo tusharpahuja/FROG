@@ -12,6 +12,10 @@ export const config = {
       type: 'array',
       items: { type: 'string' }
     },
+    introduction: {
+      title: 'Introduction',
+      type: 'string'
+    },
     prompts: {
       title: 'Prompts for each category',
       type: 'array',
@@ -93,6 +97,9 @@ export const config = {
 };
 
 export const configUI = {
+  introduction: {
+    'ui:widget': 'textarea'
+  },
   definition: {
     'ui:widget': 'textarea'
   }
