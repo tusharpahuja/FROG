@@ -22,7 +22,7 @@ Meteor.methods({
       const query = HTTP.post(url, {
         data: {
           sessionId,
-          requestType: 'SCOR',
+          requestType: 'SCORE',
           sequence,
           result
         }

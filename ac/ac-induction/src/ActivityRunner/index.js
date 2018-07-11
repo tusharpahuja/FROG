@@ -101,6 +101,7 @@ const EndPrompt = ({ classes, score }) => (
 
 class ActivityRunner extends React.Component<any, StateT> {
   cards: Object[];
+  sequence: number[];
   N: number;
 
   state = {
@@ -152,9 +153,8 @@ class ActivityRunner extends React.Component<any, StateT> {
     );
 
     const learningActivities = [
-      ...testsWithFeedback.map(example => (
-        <TestWithFeedback
-          key={example.url}
+      ...examples.map(example => (
+        <Example
           config={config}
           example={example}
           next={this.next}
@@ -162,8 +162,9 @@ class ActivityRunner extends React.Component<any, StateT> {
           logger={this.props.logger}
         />
       )),
-      ...examples.map(example => (
-        <Example
+      ...testsWithFeedback.map(example => (
+        <TestWithFeedback
+          key={example.url}
           config={config}
           example={example}
           next={this.next}
@@ -182,24 +183,42 @@ class ActivityRunner extends React.Component<any, StateT> {
         logger={this.props.logger}
       />
     ];
-    console.log('hi');
 
-    const { optimizer } = this.props;
+    const { optimizer, logger } = this.props;
     this.setState({ spinning: true });
     optimizer.recommend(config.optimId, (err, res) => {
-      console.log('hello');
       if (err) {
         console.error(err);
+        logger({ type: 'recommendation', value: 'ERROR' });
         shuffle(learningActivities)
           .slice(0, 5)
           .forEach(i => this.cards.push(i));
       } else if (res) {
-        const reco = res.data;
-        console.log(reco);
+        this.sequence = res.data.recommendation;
+        logger({ type: 'recommendation', value: this.sequence });
+        const EH = shuffle([0, 1, 2]);
+        let ehIndex = 0;
+        const TH = shuffle([3, 4, 5]);
+        let thIndex = 0;
+        this.sequence.forEach(x => {
+          if (x === 0) {
+            this.cards.push(learningActivities[EH[ehIndex]]);
+            ehIndex += 1;
+          }
+          if (x === 1) {
+            this.cards.push(learningActivities[TH[thIndex]]);
+            thIndex += 1;
+          }
+          if (x === 2) {
+            this.cards.push(learningActivities[6]);
+          }
+          if (x === 3) {
+            this.cards.push(learningActivities[7]);
+          }
+        });
       }
       this.setState({ spinning: false });
     });
-    console.log('bye');
   };
 
   getPostTest() {
@@ -221,7 +240,11 @@ class ActivityRunner extends React.Component<any, StateT> {
         />
       );
     });
+  }
 
+  getEnd() {
+    const { config } = this.props.activityData;
+    const { posttest } = this.state;
     this.cards.push(
       <SelfExplanation
         next={this.next}
@@ -229,10 +252,7 @@ class ActivityRunner extends React.Component<any, StateT> {
         logger={this.props.logger}
       />
     );
-  }
 
-  getEnd() {
-    const { posttest } = this.state;
     const score =
       Math.ceil(100 * posttest.filter(x => x > 0).length / posttest.length) +
       '%';
@@ -256,6 +276,7 @@ class ActivityRunner extends React.Component<any, StateT> {
         this.getPostTest();
         this.setState({ subActivity: 'posttest' });
       } else if (this.state.subActivity === 'posttest') {
+        this.reportToOptimizer();
         this.getEnd();
         this.setState({ subActivity: 'end' });
       }
@@ -275,18 +296,13 @@ class ActivityRunner extends React.Component<any, StateT> {
     const { posttest } = this.state;
     posttest.push(score > 0 ? 1 : -1);
     this.setState({ posttest });
-    // const { optimizer } = this.props;
-    // const { item, context } = this.state;
-    // const newContext = { ...context };
-    // newContext.tests[this.state.progress % this.tests.length] =
-    //   score > 0 ? 1 : -1;
-    // newContext.latest = this.tests.map(_ => 0);
-    // newContext.latest[this.state.progress % this.tests.length] =
-    //   score > 0 ? 1 : -1;
-    // this.setState({ context: newContext });
-    // if (this.state.subActivity == 'posttest') {
-    //   optimizer.report(this.optimId, this.getContext(), item, score);
-    // }
+  };
+
+  reportToOptimizer = () => {
+    const { config } = this.props.activityData;
+    const { optimizer } = this.props;
+    const { posttest } = this.state;
+    optimizer.report(config.optimId, this.sequence, posttest);
   };
 
   render() {
