@@ -36,12 +36,7 @@ const PretestPrompt = ({ classes, skip, next, introduction }) => (
     </CardContent>
     <CardActions>
       <Button color="primary" onClick={next} className={classes.promptButton}>
-        Yes, I know it already! Take the test.
-      </Button>
-    </CardActions>
-    <CardActions>
-      <Button color="primary" onClick={skip} className={classes.promptButton}>
-        No, I don't know it. Skip the test
+        Start the test.
       </Button>
     </CardActions>
   </Card>
