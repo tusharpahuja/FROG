@@ -70,15 +70,13 @@ const StudentView = ({ activities, session, token, classes }) => (
     <div className={classes.navbar}>
       <AppBar>
         <Toolbar className={classes.toolbar}>
-          {Meteor.user() && (
-            <Typography
-              type="subheading"
-              color="inherit"
-              className={classes.flex}
-            >
-              {Meteor.user().username}
-            </Typography>
-          )}
+          <Typography
+            type="subheading"
+            color="inherit"
+            className={classes.flex}
+          >
+            Learning Activity
+          </Typography>
           {Meteor.user() &&
             Meteor.user().username === 'teacher' && (
               <Button
