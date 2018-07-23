@@ -14,6 +14,7 @@ import red from '@material-ui/core/colors/red';
 import green from '@material-ui/core/colors/green';
 
 import styles from './style';
+import { logger } from 'handlebars';
 
 const Feedback = ({ correct, next, classes }) => (
   <React.Fragment>
@@ -43,12 +44,14 @@ const StatelessTest = props => {
     classes,
     feedback,
     setFeedback,
-    config
+    config,
+    logger
   } = props;
 
   const onClick = category => {
     const correct = category === example.category ? 1 : 0;
     const expected = example.category;
+    logger({ type: 'testwithfeedback', value: category, payload: example });
     setFeedback({ selected: category, expected, correct });
   };
 

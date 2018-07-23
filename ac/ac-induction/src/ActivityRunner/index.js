@@ -27,7 +27,7 @@ type StateT = {
   subActivity: string
 };
 
-const PretestPrompt = ({ classes, skip, next, introduction }) => (
+const PretestPrompt = ({ classes, next, introduction }) => (
   <Card className={classes.prompt}>
     <CardContent>
       <Typography gutterBottom variant="subheading">

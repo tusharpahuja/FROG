@@ -14,7 +14,7 @@ import styles from './style';
 
 const Example = ({ example, next, classes, config, logger }) => {
   const onClick = () => {
-    logger({ type: 'example' });
+    logger({ type: 'example', payload: example });
     next();
   };
 
