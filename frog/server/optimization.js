@@ -17,13 +17,13 @@ Meteor.methods({
       return query;
     }
   },
-  'optim.report': (sessionId, sequence, result) => {
+  'optim.report': (sessionId, context, result) => {
     if (Meteor.isServer) {
       const query = HTTP.post(url, {
         data: {
           sessionId,
           requestType: 'SCORE',
-          sequence,
+          context,
           result
         }
       });

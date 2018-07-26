@@ -296,8 +296,12 @@ class ActivityRunner extends React.Component<any, StateT> {
   reportToOptimizer = () => {
     const { config } = this.props.activityData;
     const { optimizer } = this.props;
-    const { posttest } = this.state;
-    optimizer.report(config.optimId, this.sequence, posttest);
+    const { posttest, pretest } = this.state;
+    optimizer.report(
+      config.optimId,
+      { sequence: this.sequence, pretest },
+      posttest
+    );
   };
 
   render() {
