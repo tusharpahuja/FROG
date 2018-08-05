@@ -240,13 +240,6 @@ class ActivityRunner extends React.Component<any, StateT> {
   getEnd() {
     const { config } = this.props.activityData;
     const { posttest } = this.state;
-    this.cards.push(
-      <SelfExplanation
-        next={this.next}
-        config={config}
-        logger={this.props.logger}
-      />
-    );
 
     const score =
       Math.ceil(100 * posttest.filter(x => x > 0).length / posttest.length) +

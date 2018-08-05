@@ -37,7 +37,7 @@ const Test = props => {
         </Typography>
       </CardContent>
       <CardActions>
-        {[...categories, '?'].map(category => (
+        {[...categories, 'Skip'].map(category => (
           <Button
             key={category}
             color="primary"
