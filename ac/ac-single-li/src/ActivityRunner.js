@@ -39,7 +39,7 @@ class ActivityRunner extends React.Component<
         )}
       </>
     );
-
+    console.log(data)
     if (data.li) {
       return (
         <div style={style}>

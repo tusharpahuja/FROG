@@ -5,7 +5,14 @@ import { type ActivityPackageT, uuid, ProgressDashboard } from 'frog-utils';
 const meta = {
   name: 'Add/edit single LI',
   shortDesc: 'New activity, no description available',
-  description: 'New activity, no description available'
+  description: 'New activity, no description available',
+  exampleData: [
+    {
+      title: 'Testing li image',
+      config: { title: 'Example image li', liType: 'li-image' },
+      data: {li: "cjkl9rpns00033g6jqv2z852s"}
+    }
+  ]
 };
 
 const config = {
@@ -34,12 +41,18 @@ const configUI = { instructions: { 'ui:widget': 'textarea' } };
 
 const dataStructure = {};
 
+const mergeFunction = (object, dataFn) => {
+  if(object.data)
+    dataFn.objInsert(object.data.li,'li')
+}
+
 export default ({
   id: 'ac-single-li',
   type: 'react-component',
   configVersion: 1,
   meta,
   config,
+  mergeFunction,
   configUI,
   formatProduct,
   dashboards: { progress: ProgressDashboard },
