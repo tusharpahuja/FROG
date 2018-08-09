@@ -47,7 +47,8 @@ export default ({ data }) => {
   if( data.callType === 'proxy'){
     const xmlHttp = new XMLHttpRequest();
     xmlHttp.open( "GET", data.url, false ); // false for synchronous request
-    xmlHttp.send( null );
+    xmlHttp.setRequestHeader("Access-Control-Allow-Origin", "*")
+    xmlHttp.send();
     return xmlHttp.responseText;
 
   } else {

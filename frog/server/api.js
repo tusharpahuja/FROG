@@ -99,7 +99,8 @@ const safeDecode = (query, field, msg, response, returnUndef) => {
 
 const InstanceDone = {};
 
-WebApp.connectHandlers.use('/api/proxy', (request, response, next) => {
+WebApp.connectHandlers.use('/api/proxy',
+(request, response, next) => {
   const url = require('url').parse(request.url);
   const proxyUrl = url.pathname.substring(1);
   InjectData.pushData(request, 'api', {
@@ -108,8 +109,10 @@ WebApp.connectHandlers.use('/api/proxy', (request, response, next) => {
     userName: request.body.userName,
     url: proxyUrl
   });
+  response.setHeader("Access-Control-Allow-Origin", "*");
   next();
-});
+}
+);
 
 WebApp.connectHandlers.use('/api/activityType', (request, response, next) => {
   const url = require('url').parse(request.url);
