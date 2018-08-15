@@ -7,6 +7,7 @@ import Stringify from 'json-stringify-pretty-compact';
 import fs from 'fs';
 import { resolve as pathResolve, join } from 'path';
 import bodyParser from 'body-parser';
+import { HTTP } from 'meteor/http'
 
 import { activityTypesObj, activityTypes } from '/imports/activityTypes';
 import { Sessions } from '/imports/api/sessions';
@@ -100,17 +101,11 @@ const safeDecode = (query, field, msg, response, returnUndef) => {
 const InstanceDone = {};
 
 WebApp.connectHandlers.use('/api/proxy',
-(request, response, next) => {
+(request, response) => {
   const url = require('url').parse(request.url);
   const proxyUrl = url.pathname.substring(1);
-  InjectData.pushData(request, 'api', {
-    callType: 'proxy',
-    userId: request.body.userId,
-    userName: request.body.userName,
-    url: proxyUrl
-  });
-  response.setHeader("Access-Control-Allow-Origin", "*");
-  next();
+  const result = HTTP.call('GET', proxyUrl)
+  response.end(result.content);
 }
 );
 
