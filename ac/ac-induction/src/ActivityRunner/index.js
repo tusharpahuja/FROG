@@ -9,6 +9,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import Example from './Example';
 import Test from './Test';
@@ -24,6 +25,7 @@ type StateT = {
   pretest: number[],
   posttest: number[],
   spinning: boolean,
+  waitingReco: boolean,
   subActivity: string
 };
 
@@ -104,6 +106,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     pretest: [],
     posttest: [],
     spinning: false,
+    waitingReco: false,
     subActivity: 'pretest'
   };
 
@@ -180,7 +183,7 @@ class ActivityRunner extends React.Component<any, StateT> {
     ];
 
     const { optimizer, logger } = this.props;
-    this.setState({ spinning: true });
+    this.setState({ waitingReco: true });
     optimizer.recommend(config.optimId, (err, res) => {
       if (err) {
         console.error(err);
@@ -212,7 +215,7 @@ class ActivityRunner extends React.Component<any, StateT> {
           }
         });
       }
-      this.setState({ spinning: false });
+      this.setState({ waitingReco: false });
     });
   };
 
@@ -248,12 +251,15 @@ class ActivityRunner extends React.Component<any, StateT> {
   }
 
   skipPretest = () => {
+    this.setState({ spinning: true });
     this.setState({ progress: this.cards.length });
     this.getLearningActivities();
     this.setState({ subActivity: 'learning' });
+    setTimeout(() => this.setState({ spinning: false }), 500);
   };
 
   next = () => {
+    this.setState({ spinning: true });
     const progress = this.state.progress + 1;
     this.props.logger({ type: 'progress', value: progress / this.N });
     if (progress >= this.cards.length) {
@@ -270,6 +276,7 @@ class ActivityRunner extends React.Component<any, StateT> {
       }
     }
     this.setState({ progress });
+    setTimeout(() => this.setState({ spinning: false }), 500);
   };
 
   handlePretestResult = score => {
@@ -298,12 +305,14 @@ class ActivityRunner extends React.Component<any, StateT> {
   };
 
   render() {
-    return this.state.spinning ? (
-      <h1>Please Wait</h1>
+    const { spinning, waitingReco, progress } = this.state;
+    console.log(spinning, waitingReco);
+    return spinning || waitingReco ? (
+      <CircularProgress />
     ) : (
       <React.Fragment>
-        <ProgressBar progress={this.state.progress} />
-        {this.cards[this.state.progress]}
+        <ProgressBar progress={progress} />
+        {this.cards[progress]}
       </React.Fragment>
     );
   }
