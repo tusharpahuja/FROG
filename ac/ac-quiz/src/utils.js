@@ -104,6 +104,7 @@ export const formatProduct = (config: Object, item: Object) => {
       : undefined;
     const maxCorrect = questions.length;
     return {
+      form,
       questions,
       answers,
       answersIndex,
